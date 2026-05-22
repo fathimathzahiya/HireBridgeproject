@@ -1,0 +1,24 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.navbar{
+    width: 100%;
+    height: 80px;
+    background-color: #f3f4ff;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+.icon{
+    font-size: 30px;
+    color: #475569;
+    cursor: pointer;
+    padding: 20px;
+}
+h1{
+  color: #0a3d91;
+  padding: 15px 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
