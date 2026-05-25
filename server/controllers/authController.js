@@ -1,6 +1,7 @@
 const StudentAuth = require("../models/studentAuthModel");
 const CompanyAuth = require("../models/companyAuthModel");
 const StudentProfile = require("../models/studentmodel");
+const CompanyProfile = require("../models/companymodel");
 
 const registerStudentAuth = async (req, res) => {
   try {
@@ -97,8 +98,38 @@ const registerCompanyAuth = async (req, res) => {
       return res.status(400).json({ error: "A company with this email already exists." });
     }
 
-    const company = await CompanyAuth.create({ name, email, website, HRName, phoneNumber, location, description, password });
-    res.json({ id: company._id, name: company.name, email: company.email, role: "company" });
+    // Create CompanyAuth record
+    const companyAuth = await CompanyAuth.create({ 
+      name, 
+      email, 
+      website, 
+      HRName, 
+      phoneNumber, 
+      location, 
+      description, 
+      password 
+    });
+
+    // Create CompanyProfile record
+    const companyProfile = await CompanyProfile.create({ 
+      name, 
+      email, 
+      website, 
+      HRName, 
+      phoneNumber, 
+      location, 
+      description, 
+      password,
+      confirmPassword
+    });
+
+    res.json({ 
+      id: companyProfile._id, 
+      authId: companyAuth._id,
+      name: companyProfile.name, 
+      email: companyProfile.email, 
+      role: "company" 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Unable to register company." });

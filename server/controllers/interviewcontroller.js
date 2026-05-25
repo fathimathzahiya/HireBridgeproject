@@ -193,9 +193,6 @@ module.exports = {
   getStudentInterviews,
   getStudentUpcomingInterviews,
   cancelInterview,
-  createinterview,
-    getinterview,getsingleinterview
-    ,updateinterview,deleteinterview
 };
        
 

@@ -182,9 +182,6 @@ module.exports = {
   getCompanyApplicantsByStatus,
   updateApplicationStatus,
   addApplicationNotes,
-  createapplication,
-    getapplication,getsingleapplication
-    ,updateapplication,deleteapplication
 };
           
 
