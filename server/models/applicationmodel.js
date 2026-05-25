@@ -19,6 +19,22 @@ const applicationSchema = new Schema(
       ref: "company",
       required: true,
     },
+
+    status: {
+      type: String,
+      enum: ["Applied", "Under Review", "Shortlisted", "Interview Scheduled", "Selected", "Rejected"],
+      default: "Applied",
+    },
+
+    appliedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    notes: {
+      type: String,
+      required: false,
+    },
   },
 );
 

@@ -35,6 +35,7 @@ const jobSchema = new Schema(
 
     jobType: {
       type: String,
+      enum: ["Full-time", "Part-time", "Internship", "Contract"],
       required: true,
     },
 
@@ -51,6 +52,27 @@ const jobSchema = new Schema(
     vaccancy: {
       type: Number,
       required: true,
+    },
+
+    applicationDeadline: {
+      type: Date,
+      required: false,
+    },
+
+    status: {
+      type: String,
+      enum: ["Open", "Closed", "On Hold"],
+      default: "Open",
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    updatedAt: {
+      type: Date,
+      default: Date.now,
     },
   },
 );

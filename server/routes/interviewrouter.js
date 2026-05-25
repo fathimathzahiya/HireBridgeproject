@@ -1,9 +1,24 @@
-const express=require('express');
-const interviewrouter=express.Router();
-const {createinterview,getinterview, getsingleinterview, updateinterview,deleteinterview}= require("../controllers/interviewcontroller");
-interviewrouter.post("/interview",createinterview);
-interviewrouter.get("/getinterview",getinterview);
-interviewrouter.get("/getsingleinterview/:id",getsingleinterview);
-interviewrouter.put("/updateinterview/:id",updateinterview);
-interviewrouter.delete("/deleteinterview/:id",deleteinterview);
-module.exports=interviewrouter;
+const express = require("express");
+const interviewrouter = express.Router();
+const {
+  scheduleInterview,
+  getCompanyInterviews,
+  getInterviewsByStatus,
+  updateInterviewStatus,
+  getStudentInterviews,
+  getStudentUpcomingInterviews,
+  cancelInterview,
+} = require("../controllers/interviewcontroller");
+
+// ===== COMPANY INTERVIEW ROUTES =====
+interviewrouter.post("/interviews", scheduleInterview);
+interviewrouter.get("/company/:companyId/interviews", getCompanyInterviews);
+interviewrouter.get("/company/:companyId/interviews/:status", getInterviewsByStatus);
+interviewrouter.put("/interviews/:interviewId", updateInterviewStatus);
+
+// ===== STUDENT INTERVIEW ROUTES =====
+interviewrouter.get("/student/:studentId/interviews", getStudentInterviews);
+interviewrouter.get("/student/:studentId/interviews/upcoming", getStudentUpcomingInterviews);
+interviewrouter.put("/interviews/:interviewId/cancel", cancelInterview);
+
+module.exports = interviewrouter;

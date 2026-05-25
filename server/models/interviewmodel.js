@@ -40,8 +40,34 @@ const interviewSchema = new Schema(
       type: String,
       required: true,
     },
-  },
 
+    status: {
+      type: String,
+      enum: ["Scheduled", "Completed", "Cancelled"],
+      default: "Scheduled",
+    },
+
+    instructions: {
+      type: String,
+      required: false,
+    },
+
+    result: {
+      type: String,
+      enum: ["Pending", "Selected", "Rejected", "On Hold"],
+      default: "Pending",
+    },
+
+    feedback: {
+      type: String,
+      required: false,
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  },
 );
 
 const interviewCollection = model(

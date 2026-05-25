@@ -1,5 +1,6 @@
 const StudentAuth = require("../models/studentAuthModel");
 const CompanyAuth = require("../models/companyAuthModel");
+const StudentProfile = require("../models/studentmodel");
 
 const registerStudentAuth = async (req, res) => {
   try {
@@ -18,8 +19,33 @@ const registerStudentAuth = async (req, res) => {
       return res.status(400).json({ error: "A student with this email already exists." });
     }
 
-    const student = await StudentAuth.create({ username, email, password, phoneNumber, college, branch, year });
-    res.json({ id: student._id, username: student.username, email: student.email, role: "student" });
+    // Create StudentAuth record
+    const studentAuth = await StudentAuth.create({ 
+      username, 
+      email, 
+      password, 
+      phoneNumber, 
+      college, 
+      branch, 
+      year 
+    });
+
+    // Create StudentProfile record
+    const studentProfile = await StudentProfile.create({
+      username,
+      email,
+      password,
+      phoneNumber,
+      department: college || "",
+    });
+
+    res.json({ 
+      id: studentProfile._id, 
+      authId: studentAuth._id,
+      username: studentAuth.username, 
+      email: studentAuth.email, 
+      role: "student" 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Unable to register student." });
@@ -38,7 +64,16 @@ const loginStudentAuth = async (req, res) => {
       return res.status(400).json({ error: "Invalid student email or password." });
     }
 
-    res.json({ id: student._id, username: student.username, email: student.email, role: "student" });
+    // Get student profile
+    const studentProfile = await StudentProfile.findOne({ email });
+
+    res.json({ 
+      id: studentProfile?._id || student._id, 
+      authId: student._id,
+      username: student.username, 
+      email: student.email, 
+      role: "student" 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Unable to login student." });
