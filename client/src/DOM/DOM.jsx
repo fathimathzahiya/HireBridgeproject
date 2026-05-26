@@ -5,6 +5,7 @@ import Studentreg from '../pages/register/Student/Studentreg'
 import Login from '../pages/login/Login'
 import StudentDashboard from '../pages/dashboard/StudentDashboard'
 import DashboardOverview from '../pages/dashboard/DashboardOverview'
+import Jobs from '../pages/dashboard/Jobs'
 import AppliedJobs from '../pages/dashboard/AppliedJobs'
 import ShortlistedJobs from '../pages/dashboard/ShortlistedJobs'
 import RejectedJobs from '../pages/dashboard/RejectedJobs'
@@ -28,6 +29,8 @@ function DOM() {
             {/* Student Dashboard */}
             <Route path='/student/dashboard' element={<StudentDashboard/>}/>
             <Route path='/student-dashboard' element={<DashboardOverview/>}/>
+            <Route path='/jobs' element={<Jobs/>}/>
+            <Route path='/student-dashboard/jobs' element={<Jobs/>}/>
             <Route path='/student-dashboard/applied-jobs' element={<AppliedJobs/>}/>
             <Route path='/student-dashboard/shortlisted-jobs' element={<ShortlistedJobs/>}/>
             <Route path='/student-dashboard/rejected-jobs' element={<RejectedJobs/>}/>

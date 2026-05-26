@@ -11,6 +11,20 @@ const apiClient = axios.create({
   },
 });
 
+// Add request interceptor to inject Authorization header
+apiClient.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("hirebridge_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // ===== COMPANY PROFILE APIs =====
 export const companyAPI = {
   getCompanyDashboard: (companyId) =>

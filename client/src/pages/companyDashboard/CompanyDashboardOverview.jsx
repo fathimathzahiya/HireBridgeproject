@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { companyAPI } from "../../utils/companyDashboardAPI";
 import "./CompanyDashboardOverview.css";
 
@@ -115,22 +115,22 @@ const CompanyDashboardOverview = () => {
       <section className="quick-actions-section">
         <h3>Quick Actions</h3>
         <div className="actions-grid">
-          <a href={`/company/${companyId}/jobs`} className="action-btn primary">
+          <Link to={`/company/${companyId}/jobs`} className="action-btn primary">
             <span>📝</span>
             Post New Job
-          </a>
-          <a href={`/company/${companyId}/applicants`} className="action-btn secondary">
+          </Link>
+          <Link to={`/company/${companyId}/applicants`} className="action-btn secondary">
             <span>👥</span>
             View Applicants
-          </a>
-          <a href={`/company/${companyId}/interviews`} className="action-btn tertiary">
+          </Link>
+          <Link to={`/company/${companyId}/interviews`} className="action-btn tertiary">
             <span>📅</span>
             Schedule Interview
-          </a>
-          <a href={`/company/${companyId}/profile`} className="action-btn quaternary">
+          </Link>
+          <Link to={`/company/${companyId}/profile`} className="action-btn quaternary">
             <span>⚙️</span>
             Edit Profile
-          </a>
+          </Link>
         </div>
       </section>
     </div>

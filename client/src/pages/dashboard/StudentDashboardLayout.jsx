@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import ProfilePopup from "../../components/ProfilePopup/ProfilePopup";
 import EditProfile from "../../components/ProfilePopup/EditProfile";
 import ConfirmLogout from "../../components/ConfirmLogout/ConfirmLogout";
@@ -16,6 +16,7 @@ function StudentDashboardLayout({ children }) {
 
   const menuItems = [
     { label: "Dashboard Overview", path: "/student-dashboard" },
+    { label: "Jobs", path: "/student-dashboard/jobs" },
     { label: "Applied Jobs", path: "/student-dashboard/applied-jobs" },
     { label: "Shortlisted Jobs", path: "/student-dashboard/shortlisted-jobs" },
     { label: "Rejected Jobs", path: "/student-dashboard/rejected-jobs" },
@@ -66,6 +67,8 @@ function StudentDashboardLayout({ children }) {
     localStorage.removeItem("studentId");
     localStorage.removeItem("studentName");
     localStorage.removeItem("studentEmail");
+    localStorage.removeItem("hirebridge_token");
+    localStorage.removeItem("hirebridge_user");
     
     // Close confirmation modal
     setShowLogoutConfirm(false);
@@ -134,9 +137,9 @@ function StudentDashboardLayout({ children }) {
         {/* Navbar */}
         <div className="topbar">
           <div className="nav-links">
-            <a href="/student-dashboard">Dashboard</a>
-            <a href="/jobs">Jobs</a>
-            <a href="/resources">Resources</a>
+            <Link to="/student-dashboard">Dashboard</Link>
+            <Link to="/student-dashboard/jobs">Jobs</Link>
+            <Link to="/resources">Resources</Link>
           </div>
 
           <div className="top-right">

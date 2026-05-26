@@ -7,7 +7,7 @@ const Student = require("../models/studentmodel");
 // Apply for a job (create application)
 const applyForJob = async (req, res) => {
   try {
-    const { studentId, jobId, companyId } = req.body;
+    const { studentId, jobId, companyId, phone, coverLetter, resume } = req.body;
 
     // Check if student already applied
     const existingApplication = await Application.findOne({
@@ -25,6 +25,9 @@ const applyForJob = async (req, res) => {
       studentId,
       jobId,
       companyId,
+      phone,
+      coverLetter,
+      resume,
       status: "Applied",
     });
 

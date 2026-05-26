@@ -131,27 +131,29 @@ const JobPostings = () => {
     <div className="job-postings-container">
       <div className="job-postings-header">
         <h2>Job Postings</h2>
-        <button
-          className="btn-primary"
-          onClick={() => {
-            setShowForm(!showForm);
-            setEditingJobId(null);
-            setFormData({
-              title: "",
-              description: "",
-              skillRequired: "",
-              salary: "",
-              location: "",
-              jobType: "Full-time",
-              minimumCGPA: "",
-              department: "",
-              vaccancy: "",
-              applicationDeadline: "",
-            });
-          }}
-        >
-          {showForm ? "Cancel" : "+ Post New Job"}
-        </button>
+        {!showForm && (
+          <button
+            className="btn-post-new-job"
+            onClick={() => {
+              setShowForm(true);
+              setEditingJobId(null);
+              setFormData({
+                title: "",
+                description: "",
+                skillRequired: "",
+                salary: "",
+                location: "",
+                jobType: "Full-time",
+                minimumCGPA: "",
+                department: "",
+                vaccancy: "",
+                applicationDeadline: "",
+              });
+            }}
+          >
+            + Post New Job
+          </button>
+        )}
       </div>
 
       {error && <div className="error-message">{error}</div>}
@@ -291,9 +293,21 @@ const JobPostings = () => {
               </div>
             </div>
 
-            <button type="submit" className="btn-submit">
-              {editingJobId ? "Update Job" : "Post Job"}
-            </button>
+            <div className="form-actions-row">
+              <button type="submit" className="btn-submit">
+                {editingJobId ? "Update Job" : "Post Job"}
+              </button>
+              <button
+                type="button"
+                className="btn-cancel-form"
+                onClick={() => {
+                  setShowForm(false);
+                  setEditingJobId(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </form>
         </div>
       )}

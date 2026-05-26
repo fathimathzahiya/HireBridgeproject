@@ -2,33 +2,56 @@
 
 const API_BASE_URL = "http://localhost:5000/api";
 
+// Helper function to fetch with auth token
+const fetchWithAuth = (url, options = {}) => {
+  const token = localStorage.getItem("hirebridge_token");
+  const headers = {
+    "Content-Type": "application/json",
+    ...options.headers,
+  };
+  
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  
+  return fetch(url, {
+    ...options,
+    headers,
+  }).then(async (res) => {
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "API Request failed");
+    }
+    return data;
+  });
+};
+
 // Student APIs
 export const studentAPI = {
-  getStudent: (id) => fetch(`${API_BASE_URL}/student/getsinglestudent/${id}`).then(res => res.json()),
-  getAllStudents: () => fetch(`${API_BASE_URL}/student/getstudent`).then(res => res.json()),
+  getStudent: (id) => fetchWithAuth(`${API_BASE_URL}/student/getsinglestudent/${id}`),
+  getAllStudents: () => fetchWithAuth(`${API_BASE_URL}/student/getstudent`),
 };
 
 // Job APIs
 export const jobAPI = {
-  getJob: (id) => fetch(`${API_BASE_URL}/job/getsinglejob/${id}`).then(res => res.json()),
-  getAllJobs: () => fetch(`${API_BASE_URL}/job/getjob`).then(res => res.json()),
+  getJob: (id) => fetchWithAuth(`${API_BASE_URL}/jobs/${id}`),
+  getAllJobs: () => fetchWithAuth(`${API_BASE_URL}/jobs`),
 };
 
 // Application APIs
 export const applicationAPI = {
-  getApplication: (id) => fetch(`${API_BASE_URL}/application/getsingleapplication/${id}`).then(res => res.json()),
-  getAllApplications: () => fetch(`${API_BASE_URL}/application/getapplication`).then(res => res.json()),
-  createApplication: (data) => fetch(`${API_BASE_URL}/application/application`, {
+  getStudentApplications: (studentId) => fetchWithAuth(`${API_BASE_URL}/student/${studentId}/applications`),
+  getStudentApplicationsByStatus: (studentId, status) => fetchWithAuth(`${API_BASE_URL}/student/${studentId}/applications/${status}`),
+  createApplication: (data) => fetchWithAuth(`${API_BASE_URL}/applications`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
-  }).then(res => res.json()),
+  }),
 };
 
 // Interview APIs
 export const interviewAPI = {
-  getInterview: (id) => fetch(`${API_BASE_URL}/interview/getsingleinterview/${id}`).then(res => res.json()),
-  getAllInterviews: () => fetch(`${API_BASE_URL}/interview/getinterview`).then(res => res.json()),
+  getStudentInterviews: (studentId) => fetchWithAuth(`${API_BASE_URL}/student/${studentId}/interviews`),
+  getStudentUpcomingInterviews: (studentId) => fetchWithAuth(`${API_BASE_URL}/student/${studentId}/interviews/upcoming`),
 };
 
 // Utility functions
@@ -64,3 +87,4 @@ export const getTimeStatus = (date, time) => {
   }
   return "upcoming";
 };
+

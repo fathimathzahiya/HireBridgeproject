@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import CompanyProfilePopup from "../../components/CompanyProfilePopup/CompanyProfilePopup";
 import "./CompanyDashboardLayout.css";
 
@@ -13,6 +13,15 @@ const CompanyDashboardLayout = ({ children }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [actualCompanyId, setActualCompanyId] = useState(companyId);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  const menuItems = [
+    { id: "overview", label: "Dashboard Overview", icon: "📊" },
+    { id: "jobs", label: "Job Postings", icon: "💼" },
+    { id: "applicants", label: "Applicants", icon: "👥" },
+    { id: "interviews", label: "Interviews", icon: "📅" },
+    { id: "profile", label: "Company Profile", icon: "🏢" },
+  ];
 
   useEffect(() => {
     // Get company name from localStorage or props
@@ -33,6 +42,14 @@ const CompanyDashboardLayout = ({ children }) => {
     fetchCompanyData(companyId || storedCompanyId);
   }, [companyId]);
 
+  useEffect(() => {
+    const pathParts = location.pathname.split("/");
+    const lastPart = pathParts[pathParts.length - 1];
+    if (menuItems.some((item) => item.id === lastPart)) {
+      setActiveMenu(lastPart);
+    }
+  }, [location]);
+
   const fetchCompanyData = async (id) => {
     try {
       setLoading(true);
@@ -52,16 +69,10 @@ const CompanyDashboardLayout = ({ children }) => {
     localStorage.removeItem("companyId");
     localStorage.removeItem("companyName");
     localStorage.removeItem("companyEmail");
+    localStorage.removeItem("hirebridge_token");
+    localStorage.removeItem("hirebridge_user");
     navigate("/login");
   };
-
-  const menuItems = [
-    { id: "overview", label: "Dashboard Overview", icon: "📊" },
-    { id: "jobs", label: "Job Postings", icon: "💼" },
-    { id: "applicants", label: "Applicants", icon: "👥" },
-    { id: "interviews", label: "Interviews", icon: "📅" },
-    { id: "profile", label: "Company Profile", icon: "🏢" },
-  ];
 
   return (
     <div className="company-dashboard-layout">
