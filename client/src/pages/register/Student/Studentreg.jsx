@@ -156,6 +156,7 @@ function Studentreg() {
       console.log('Profile update successful:', updateResponse.data);
 
       setStatusMessage('Registration successful! Redirecting to login...')
+      
       setTimeout(() => {
         navigate('/studentlogin')
       }, 2000)

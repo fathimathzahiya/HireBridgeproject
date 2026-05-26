@@ -11,7 +11,13 @@ function ProfilePopup({ studentData, onClose, onEdit }) {
         {/* Profile Header */}
         <div className="profile-popup-header">
           <img
-            src={studentData?.profileImage || "https://i.pravatar.cc/150"}
+            src={
+              studentData?.profileImage
+                ? studentData.profileImage.startsWith("http")
+                  ? studentData.profileImage
+                  : `http://localhost:5000${studentData.profileImage}`
+                : "https://i.pravatar.cc/150"
+            }
             alt={studentData?.username}
             className="profile-popup-image"
           />

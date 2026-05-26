@@ -5,25 +5,27 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1001;
   animation: fadeIn 0.3s ease-in-out;
+  backdrop-filter: blur(4px);
 }
 
 .edit-profile {
   background: white;
-  border-radius: 15px;
+  border-radius: 20px;
   padding: 30px;
   width: 90%;
   max-width: 600px;
   max-height: 85vh;
   overflow-y: auto;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
   animation: slideUp 0.3s ease-in-out;
   position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .edit-profile .close-btn {
@@ -32,11 +34,11 @@
   right: 15px;
   background: #f0f0f0;
   border: none;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 20px;
   color: #666;
   display: flex;
   align-items: center;
@@ -47,47 +49,51 @@
 .edit-profile .close-btn:hover {
   background: #e74c3c;
   color: white;
+  transform: rotate(90deg);
 }
 
 .edit-profile h2 {
-  color: #333;
+  color: #2c3e50;
   margin-bottom: 25px;
-  font-size: 24px;
+  font-size: 26px;
   margin-top: 10px;
+  font-weight: 700;
 }
 
 /* Messages */
 .error-message {
-  background: #ffe0e0;
+  background: linear-gradient(135deg, #ffe0e0 0%, #ffcccc 100%);
   color: #c0392b;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border-radius: 10px;
   margin-bottom: 20px;
   border-left: 4px solid #c0392b;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .success-message {
-  background: #e0ffe0;
+  background: linear-gradient(135deg, #e0ffe0 0%, #ccffcc 100%);
   color: #27ae60;
-  padding: 12px;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border-radius: 10px;
   margin-bottom: 20px;
   border-left: 4px solid #27ae60;
   font-size: 14px;
+  font-weight: 500;
 }
 
 /* Form */
 form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 18px;
 }
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px;
+  gap: 18px;
 }
 
 .form-row.single {
@@ -100,55 +106,99 @@ form {
 }
 
 .form-group label {
-  color: #333;
+  color: #2c3e50;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
   font-size: 14px;
 }
 
 .form-group input,
 .form-group textarea {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  padding: 14px 16px;
+  border: 2px solid #ecf0f1;
+  border-radius: 10px;
   font-size: 14px;
   font-family: Arial, sans-serif;
   transition: all 0.3s ease;
+  background: #f9fafb;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
   outline: none;
   border-color: #3498db;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-  background: #f9fcff;
+  box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
+  background: white;
+}
+
+.form-group input[type="file"] {
+  padding: 12px;
+  border: 2px dashed #3498db;
+  background: #ecf7ff;
+}
+
+.form-group input[type="file"]:focus {
+  border-color: #2980b9;
+  background: #e8f4ff;
 }
 
 .form-group textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
+}
+
+.file-hint {
+  font-size: 12px;
+  color: #7f8c8d;
+  margin-top: 6px;
+}
+
+.file-selected {
+  font-size: 12px;
+  color: #27ae60;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.existing-file {
+  font-size: 12px;
+  color: #3498db;
+  margin-top: 6px;
+}
+
+.existing-file a {
+  color: #3498db;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.existing-file a:hover {
+  color: #2980b9;
+  text-decoration: underline;
 }
 
 /* Form Actions */
 .form-actions {
   display: flex;
   gap: 12px;
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px solid #ecf0f1;
+  margin-top: 25px;
+  padding-top: 25px;
+  border-top: 2px solid #ecf0f1;
 }
 
 .btn-save,
 .btn-cancel {
   flex: 1;
-  padding: 12px 20px;
+  padding: 14px 20px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   transition: all 0.3s ease;
 }
+
 
 .btn-save {
   background: #27ae60;

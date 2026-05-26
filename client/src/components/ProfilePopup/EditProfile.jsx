@@ -10,13 +10,13 @@ function EditProfile({ studentData, onClose, onSave }) {
     project: studentData?.project || "",
     skills: studentData?.skills || "",
     certification: studentData?.certification || "",
-    resume: studentData?.resume || "",
     address: studentData?.address || "",
     github: studentData?.github || "",
     linkedin: studentData?.linkedin || "",
     profileImage: studentData?.profileImage || "",
   });
 
+  const [resumeFile, setResumeFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -27,6 +27,24 @@ function EditProfile({ studentData, onClose, onSave }) {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleResumeChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Please upload a PDF file");
+        setResumeFile(null);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size must be less than 5MB");
+        setResumeFile(null);
+        return;
+      }
+      setResumeFile(file);
+      setError("");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -43,14 +61,26 @@ function EditProfile({ studentData, onClose, onSave }) {
         return;
       }
 
+      // Create FormData for multipart request
+      const data = new FormData();
+      
+      // Add text fields
+      Object.keys(formData).forEach(key => {
+        if (formData[key]) {
+          data.append(key, formData[key]);
+        }
+      });
+
+      // Add resume file if selected
+      if (resumeFile) {
+        data.append("resume", resumeFile);
+      }
+
       const response = await fetch(
         `http://localhost:5000/api/student/updatestudent/${studentId}`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
+          body: data,
         }
       );
 
@@ -131,7 +161,7 @@ function EditProfile({ studentData, onClose, onSave }) {
                 onChange={handleChange}
                 step="0.01"
                 min="0"
-                max="4"
+                max="10"
               />
             </div>
           </div>
@@ -189,14 +219,33 @@ function EditProfile({ studentData, onClose, onSave }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label>Resume URL</label>
+              <label>Resume (PDF File)</label>
               <input
-                type="url"
+                type="file"
                 name="resume"
-                value={formData.resume}
-                onChange={handleChange}
-                placeholder="https://example.com/resume.pdf"
+                accept="application/pdf"
+                onChange={handleResumeChange}
               />
+              <p className="file-hint">PDF only, max 5MB. Leave blank to keep existing resume.</p>
+              {resumeFile && (
+                <p className="file-selected">✓ {resumeFile.name}</p>
+              )}
+              {studentData?.resume && !resumeFile && (
+                <p className="existing-file">
+                  Current resume:{" "}
+                  <a
+                    href={
+                      studentData.resume.startsWith("http")
+                        ? studentData.resume
+                        : `http://localhost:5000${studentData.resume}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Download
+                  </a>
+                </p>
+              )}
             </div>
           </div>
 

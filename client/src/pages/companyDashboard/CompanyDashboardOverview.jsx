@@ -4,26 +4,42 @@ import { companyAPI } from "../../utils/companyDashboardAPI";
 import "./CompanyDashboardOverview.css";
 
 const CompanyDashboardOverview = () => {
-  const { companyId } = useParams();
+  const { companyId: urlCompanyId } = useParams();
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Get companyId from URL or localStorage
+  const companyId = urlCompanyId || localStorage.getItem('companyId');
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        console.log('Fetching dashboard for company ID:', companyId);
+        
+        if (!companyId) {
+          setError("Company ID not found");
+          setLoading(false);
+          return;
+        }
+        
         const data = await companyAPI.getCompanyDashboard(companyId);
+        console.log('Dashboard data received:', data);
+        
         setDashboardData(data);
         setError(null);
       } catch (err) {
-        setError("Failed to fetch dashboard data");
-        console.error(err);
+        console.error('Error fetching dashboard:', err);
+        setError(err.response?.data?.error || "Failed to fetch dashboard data");
       } finally {
         setLoading(false);
       }
     };
 
+    // Fetch data when component mounts or when companyId changes
     if (companyId) {
       fetchDashboardData();
     }
@@ -92,41 +108,6 @@ const CompanyDashboardOverview = () => {
               </div>
             </div>
           ))}
-        </div>
-      </section>
-
-      {/* Company Info */}
-      <section className="company-info-section">
-        <div className="info-card">
-          <h3>Company Information</h3>
-          <div className="info-grid">
-            <div className="info-item">
-              <span className="info-label">Company Name</span>
-              <span className="info-value">{company.name}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Email</span>
-              <span className="info-value">{company.email}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Location</span>
-              <span className="info-value">{company.location}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Industry</span>
-              <span className="info-value">{company.industry || "Not specified"}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Company Size</span>
-              <span className="info-value">{company.companySize || "Not specified"}</span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Website</span>
-              <a href={company.website} target="_blank" rel="noopener noreferrer" className="info-value">
-                {company.website}
-              </a>
-            </div>
-          </div>
         </div>
       </section>
 

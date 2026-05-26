@@ -21,6 +21,8 @@ body{
     min-height:100vh;
     padding:20px;
     border-right:1px solid #ddd;
+    display: flex;
+    flex-direction: column;
 }
 
 .logo{
@@ -36,6 +38,7 @@ body{
 
 .menu{
     list-style:none;
+    flex: 1;
 }
 
 .menu li{
@@ -43,15 +46,23 @@ body{
     margin-bottom:10px;
     border-radius:10px;
     cursor:pointer;
+    transition: all 0.3s ease;
+    color: #333;
+    font-weight: 500;
+    border-left: 3px solid transparent;
 }
 
 .menu li:hover{
     background:#e8efff;
+    border-left-color: #1d4ed8;
+    transform: translateX(4px);
 }
 
 .active{
     background:#4f7df3;
     color:white;
+    border-left-color: #ffffff;
+    font-weight: 600;
 }
 
 /* Profile Box */
@@ -96,12 +107,24 @@ body{
 }
 
 .bottom-menu{
-    margin-top:250px;
+    margin-top:auto;
+    padding-top: 20px;
+    border-top: 1px solid #f0f0f0;
 }
 
 .bottom-menu p{
     margin-bottom:20px;
     color:#444;
+    padding: 12px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.bottom-menu p:hover{
+    background: #f0f0f0;
+    transform: translateX(4px);
 }
 
 /* Main Content */
@@ -125,6 +148,27 @@ body{
     margin-right:30px;
     color:#222;
     font-weight:bold;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.nav-links a:hover{
+    color: #1d4ed8;
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #1d4ed8;
+    transition: width 0.3s ease;
+}
+
+.nav-links a:hover::after {
+    width: 100%;
 }
 
 .top-right{
@@ -139,6 +183,14 @@ body{
     border:none;
     border-radius:20px;
     background:#eef2ff;
+    transition: all 0.3s ease;
+}
+
+.top-right input:focus {
+    outline: none;
+    background: #e8edff;
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.2);
+    transform: scale(1.02);
 }
 
 .top-right img{
@@ -205,6 +257,14 @@ body{
     padding:25px;
     border-radius:20px;
     box-shadow:0px 2px 10px rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+}
+
+.card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.12);
+    border-color: #e0e8ff;
 }
 
 .card h3{
@@ -241,6 +301,14 @@ body{
     background:white;
     padding:25px;
     border-radius:20px;
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+}
+
+.job-card:hover{
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.12);
+    border-color: #e0e8ff;
 }
 
 .job-top{
@@ -278,10 +346,14 @@ body{
     background:#1d4ed8;
     color:white;
     cursor:pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
 }
 
 .job-bottom button:hover{
     background:#163fb8;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
 }
 
 /* Bottom Section */

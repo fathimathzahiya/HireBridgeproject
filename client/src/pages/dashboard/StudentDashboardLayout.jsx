@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ProfilePopup from "../../components/ProfilePopup/ProfilePopup";
 import EditProfile from "../../components/ProfilePopup/EditProfile";
+import ConfirmLogout from "../../components/ConfirmLogout/ConfirmLogout";
 import "./StudentDashboard.css";
 
 function StudentDashboardLayout({ children }) {
@@ -10,6 +11,7 @@ function StudentDashboardLayout({ children }) {
   const [studentData, setStudentData] = useState(null);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const menuItems = [
@@ -54,6 +56,28 @@ function StudentDashboardLayout({ children }) {
     navigate(path);
   };
 
+  const handleLogout = () => {
+    // Show confirmation modal instead of logging out immediately
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    // Clear localStorage
+    localStorage.removeItem("studentId");
+    localStorage.removeItem("studentName");
+    localStorage.removeItem("studentEmail");
+    
+    // Close confirmation modal
+    setShowLogoutConfirm(false);
+    
+    // Navigate to login page
+    navigate("/studentlogin");
+  };
+
+  const cancelLogout = () => {
+    setShowLogoutConfirm(false);
+  };
+
   const isMenuActive = (path) => {
     return location.pathname === path;
   };
@@ -92,28 +116,15 @@ function StudentDashboardLayout({ children }) {
           ))}
         </ul>
 
-        {/* Profile Strength */}
-        <div className="profile-box">
-          <div className="strength">
-            <span>Profile Strength</span>
-            <span>85%</span>
-          </div>
-
-          <div className="progress">
-            <div className="progress-fill"></div>
-          </div>
-
-          <button className="profile-btn">
-            Complete Profile
-          </button>
-        </div>
-
         <div className="bottom-menu">
           <p onClick={() => navigate("/settings")} style={{ cursor: "pointer" }}>
             ⚙ Settings
           </p>
           <p onClick={() => navigate("/help")} style={{ cursor: "pointer" }}>
             ❓ Help Center
+          </p>
+          <p onClick={handleLogout} style={{ cursor: "pointer", color: "#d32f2f", fontWeight: "bold" }}>
+            🚪 Logout
           </p>
         </div>
       </div>
@@ -142,7 +153,13 @@ function StudentDashboardLayout({ children }) {
                 {!loading && studentData ? studentData.username : "Student"}
               </span>
               <img
-                src={studentData?.profileImage || "https://i.pravatar.cc/40"}
+                src={
+                  studentData?.profileImage
+                    ? studentData.profileImage.startsWith("http")
+                      ? studentData.profileImage
+                      : `http://localhost:5000${studentData.profileImage}`
+                    : "https://i.pravatar.cc/40"
+                }
                 alt="profile"
                 className="profile-image"
                 onClick={handleProfileImageClick}
@@ -172,6 +189,14 @@ function StudentDashboardLayout({ children }) {
           studentData={studentData}
           onClose={() => setShowEditProfile(false)}
           onSave={handleSaveProfile}
+        />
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <ConfirmLogout
+          onConfirm={confirmLogout}
+          onCancel={cancelLogout}
         />
       )}
     </div>

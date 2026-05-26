@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
+import CompanyProfilePopup from "../../components/CompanyProfilePopup/CompanyProfilePopup";
 import "./CompanyDashboardLayout.css";
 
 const CompanyDashboardLayout = ({ children }) => {
@@ -7,13 +8,45 @@ const CompanyDashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const [activeMenu, setActiveMenu] = useState("overview");
   const [companyName, setCompanyName] = useState("");
+  const [companyData, setCompanyData] = useState(null);
+  const [showProfilePopup, setShowProfilePopup] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [actualCompanyId, setActualCompanyId] = useState(companyId);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Get company name from localStorage or props
     const storedCompanyName = localStorage.getItem("companyName") || "Company";
+    const storedCompanyId = localStorage.getItem("companyId");
+    
     setCompanyName(storedCompanyName);
-  }, []);
+    
+    // Set actual company ID from URL or localStorage
+    if (companyId) {
+      setActualCompanyId(companyId);
+      localStorage.setItem("companyId", companyId);
+    } else if (storedCompanyId) {
+      setActualCompanyId(storedCompanyId);
+    }
+    
+    // Fetch company data
+    fetchCompanyData(companyId || storedCompanyId);
+  }, [companyId]);
+
+  const fetchCompanyData = async (id) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`http://localhost:5000/api/company/${id}`);
+      if (response.ok) {
+        const data = await response.json();
+        setCompanyData(data);
+      }
+    } catch (error) {
+      console.error("Error fetching company data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("companyId");
@@ -50,7 +83,7 @@ const CompanyDashboardLayout = ({ children }) => {
           {menuItems.map((item) => (
             <Link
               key={item.id}
-              to={`/company/${companyId}/${item.id}`}
+              to={`/company/${actualCompanyId}/${item.id}`}
               className={`nav-link ${activeMenu === item.id ? "active" : ""}`}
               onClick={() => setActiveMenu(item.id)}
             >
@@ -81,6 +114,19 @@ const CompanyDashboardLayout = ({ children }) => {
           </div>
           <div className="header-right">
             <span className="company-name">{companyName}</span>
+            <img
+              src={
+                companyData?.companyLogo
+                  ? companyData.companyLogo.startsWith("http")
+                    ? companyData.companyLogo
+                    : `http://localhost:5000${companyData.companyLogo}`
+                  : "https://via.placeholder.com/40?text=" + encodeURIComponent(companyName.substring(0, 1))
+              }
+              alt="company logo"
+              className="header-company-logo"
+              onClick={() => setShowProfilePopup(true)}
+              title="Click to view profile"
+            />
             <button className="header-logout-btn" onClick={handleLogout}>
               Logout
             </button>
@@ -89,6 +135,18 @@ const CompanyDashboardLayout = ({ children }) => {
 
         <section className="dashboard-content">{children}</section>
       </main>
+
+      {/* Company Profile Popup */}
+      {showProfilePopup && companyData && (
+        <CompanyProfilePopup
+          companyData={companyData}
+          onClose={() => setShowProfilePopup(false)}
+          onEdit={() => {
+            setShowProfilePopup(false);
+            navigate(`/company/${actualCompanyId}/profile`);
+          }}
+        />
+      )}
     </div>
   );
 };

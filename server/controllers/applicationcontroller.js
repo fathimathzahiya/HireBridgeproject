@@ -182,7 +182,9 @@ module.exports = {
   getCompanyApplicantsByStatus,
   updateApplicationStatus,
   addApplicationNotes,
+
 };
+
           
 
 

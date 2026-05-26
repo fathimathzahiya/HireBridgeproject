@@ -144,12 +144,20 @@ const loginCompanyAuth = async (req, res) => {
       return res.status(400).json({ error: "Email and password are required." });
     }
 
-    const company = await CompanyAuth.findOne({ email });
-    if (!company || company.password !== password) {
+    const companyAuth = await CompanyAuth.findOne({ email });
+    if (!companyAuth || companyAuth.password !== password) {
       return res.status(400).json({ error: "Invalid company email or password." });
     }
 
-    res.json({ id: company._id, name: company.name, email: company.email, role: "company" });
+    // Get the company profile (main company record)
+    const companyProfile = await CompanyProfile.findOne({ email });
+    
+    res.json({ 
+      id: companyProfile?._id || companyAuth._id, 
+      name: companyAuth.name, 
+      email: companyAuth.email, 
+      role: "company" 
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Unable to login company." });

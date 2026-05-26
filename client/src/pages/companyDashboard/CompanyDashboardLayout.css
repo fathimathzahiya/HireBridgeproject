@@ -158,6 +158,22 @@
   color: #2d3748;
 }
 
+.header-company-logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid #ecf0f1;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.header-company-logo:hover {
+  border-color: #3498db;
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
 .header-logout-btn {
   padding: 10px 20px;
   background: #e74c3c;

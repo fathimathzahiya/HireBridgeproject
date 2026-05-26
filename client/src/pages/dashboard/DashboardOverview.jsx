@@ -76,20 +76,6 @@ function DashboardOverview() {
             <h1>{stats.savedJobs}</h1>
           </div>
         </div>
-
-        {/* Profile Overview */}
-        {studentData && (
-          <div className="profile-overview" style={{ marginTop: "30px" }}>
-            <div className="card" style={{ padding: "20px" }}>
-              <h2>Your Profile</h2>
-              <p><strong>Department:</strong> {studentData.department}</p>
-              <p><strong>CGPA:</strong> {studentData.cgpa}</p>
-              <p><strong>Skills:</strong> {studentData.skills}</p>
-              <p><strong>Phone:</strong> {studentData.phoneNumber}</p>
-              <p><strong>Address:</strong> {studentData.address}</p>
-            </div>
-          </div>
-        )}
       </div>
     </StudentDashboardLayout>
   );

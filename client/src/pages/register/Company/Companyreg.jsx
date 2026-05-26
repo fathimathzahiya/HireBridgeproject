@@ -37,8 +37,12 @@ function Companyreg() {
         password,
         confirmPassword,
       })
-      // Redirect to login page after successful registration
-      navigate('/login')
+      
+      setStatusMessage('Registration successful! Redirecting to login...')
+      
+      setTimeout(() => {
+        navigate('/companylogin')
+      }, 2000)
     } catch (error) {
       const message = error.response?.data?.error || 'Unable to register company.'
       setStatusMessage(message)
