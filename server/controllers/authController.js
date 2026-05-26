@@ -36,6 +36,7 @@ const registerStudentAuth = async (req, res) => {
       username,
       email,
       password,
+      confirmPassword,
       phoneNumber,
       department: college || "",
     });

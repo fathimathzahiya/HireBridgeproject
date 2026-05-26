@@ -25,6 +25,7 @@ function Studentreg() {
   const [filePreview, setFilePreview] = useState({
     profileImage: null,
     resume: null,
+    certification: null,
   })
 
   const [files, setFiles] = useState({
@@ -71,6 +72,11 @@ function Studentreg() {
           ...prev,
           resume: file.name,
         }))
+      } else if (name === 'certification') {
+        setFilePreview(prev => ({
+          ...prev,
+          certification: file.name,
+        }))
       }
     }
   }
@@ -104,19 +110,24 @@ function Studentreg() {
         confirmPassword: formData.confirmPassword,
       })
 
+      console.log('Auth registration successful:', response.data);
+
       // Create FormData for file upload
       const profileFormData = new FormData()
-      profileFormData.append('username', formData.fullname)
-      profileFormData.append('email', formData.email)
-      profileFormData.append('phoneNumber', formData.phone)
-      profileFormData.append('department', formData.department)
-      profileFormData.append('cgpa', formData.cgpa ? parseFloat(formData.cgpa) : null)
-      profileFormData.append('project', formData.project)
-      profileFormData.append('skills', formData.skills)
-      profileFormData.append('github', formData.github)
-      profileFormData.append('linkedin', formData.linkedin)
-      profileFormData.append('address', formData.address)
-      profileFormData.append('password', formData.password)
+      
+      // Only append non-empty fields
+      if (formData.fullname) profileFormData.append('username', formData.fullname)
+      if (formData.email) profileFormData.append('email', formData.email)
+      if (formData.phone) profileFormData.append('phoneNumber', formData.phone)
+      if (formData.department) profileFormData.append('department', formData.department)
+      if (formData.cgpa) profileFormData.append('cgpa', parseFloat(formData.cgpa))
+      if (formData.project) profileFormData.append('project', formData.project)
+      if (formData.skills) profileFormData.append('skills', formData.skills)
+      if (formData.github) profileFormData.append('github', formData.github)
+      if (formData.linkedin) profileFormData.append('linkedin', formData.linkedin)
+      if (formData.address) profileFormData.append('address', formData.address)
+      if (formData.password) profileFormData.append('password', formData.password)
+      if (formData.confirmPassword) profileFormData.append('confirmPassword', formData.confirmPassword)
 
       // Append files if they exist
       if (files.resume) {
@@ -129,8 +140,10 @@ function Studentreg() {
         profileFormData.append('certification', files.certification)
       }
 
+      console.log('Updating student profile with ID:', response.data.id);
+
       // Send with FormData
-      await axios.put(
+      const updateResponse = await axios.put(
         `http://localhost:5000/api/student/updatestudent/${response.data.id}`,
         profileFormData,
         {
@@ -140,12 +153,16 @@ function Studentreg() {
         }
       )
 
+      console.log('Profile update successful:', updateResponse.data);
+
       setStatusMessage('Registration successful! Redirecting to login...')
       setTimeout(() => {
         navigate('/studentlogin')
       }, 2000)
     } catch (error) {
-      const message = error.response?.data?.error || 'Unable to register student.'
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response);
+      const message = error.response?.data?.error || error.message || 'Unable to register student.'
       setStatusMessage(message)
     } finally {
       setLoading(false)
@@ -296,7 +313,7 @@ function Studentreg() {
                 <label htmlFor='certificationUpload' className='file-input-label'>Choose File</label>
               </div>
               <p className='file-info'>Supported: PDF, Images (JPG, PNG), Documents (DOC, DOCX)</p>
-              {formData.certification && <p className='file-selected'>✓ File selected</p>}
+              {filePreview.certification && <p className='file-selected'>✓ {filePreview.certification}</p>}
             </div>
           </div>
 

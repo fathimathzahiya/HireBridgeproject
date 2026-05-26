@@ -20,6 +20,8 @@ function DOM() {
             {/* Login & Registration */}
             <Route path='/' element={<Login defaultRole='student'/>}/>
             <Route path='/login' element={<Login defaultRole='student'/>}/>
+            <Route path='/studentlogin' element={<Login defaultRole='student'/>}/>
+            <Route path='/companylogin' element={<Login defaultRole='company'/>}/>
             <Route path='/studentreg' element={<Studentreg/>}/>
             <Route path='/companyreg' element={<Companyreg/>}/>
 

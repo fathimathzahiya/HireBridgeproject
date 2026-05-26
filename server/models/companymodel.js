@@ -74,6 +74,26 @@ const companySchema = new Schema(
       required: true,
     },
 
+    foundedYear: {
+      type: Number,
+      required: false,
+    },
+
+    employees: {
+      type: Number,
+      required: false,
+    },
+
+    country: {
+      type: String,
+      required: false,
+    },
+
+    city: {
+      type: String,
+      required: false,
+    },
+
     createdAt: {
       type: Date,
       default: Date.now,

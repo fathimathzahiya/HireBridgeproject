@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const connectDB = require('./config/db');
 const app = express();
 
@@ -9,6 +10,9 @@ app.use(cors());
 // Increase payload limit for file uploads
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const studentroute = require("./routes/studentrouter");
 app.use("/api", studentroute);

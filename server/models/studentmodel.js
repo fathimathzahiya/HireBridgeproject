@@ -2,6 +2,18 @@ const { Schema, model } = require("mongoose");
 
 const studentSchema = new Schema(
   {
+    // ========== SECURITY INFORMATION ==========
+    password: {
+      type: String,
+      required: true,
+    },
+
+    confirmPassword: {
+      type: String,
+      required: false,
+    },
+
+    // ========== BASIC INFORMATION ==========
     username: {
       type: String,
       required: true,
@@ -13,16 +25,17 @@ const studentSchema = new Schema(
       unique: true,
     },
 
-    password: {
-      type: String,
-      required: true,
-    },
-
     phoneNumber: {
       type: String,
       required: false,
     },
 
+    address: {
+      type: String,
+      required: false,
+    },
+
+    // ========== ACADEMIC INFORMATION ==========
     department: {
       type: String,
       required: false,
@@ -33,31 +46,18 @@ const studentSchema = new Schema(
       required: false,
     },
 
-    project: {
-      type: String,
-      required: false,
-    },
-
+    // ========== PROFESSIONAL INFORMATION ==========
     skills: {
       type: String,
       required: false,
     },
 
-    certification: {
+    project: {
       type: String,
       required: false,
     },
 
-    resume: {
-      type: String,
-      required: false,
-    },
-
-    profileImage: {
-      type: String,
-      default: "https://i.pravatar.cc/150",
-    },
-
+    // ========== LINKS & DOCUMENTS ==========
     github: {
       type: String,
       required: false,
@@ -68,11 +68,22 @@ const studentSchema = new Schema(
       required: false,
     },
 
-    address: {
+    resume: {
       type: String,
       required: false,
     },
 
+    certification: {
+      type: String,
+      required: false,
+    },
+
+    profileImage: {
+      type: String,
+      default: "https://i.pravatar.cc/150",
+    },
+
+    // ========== METADATA ==========
     createdAt: {
       type: Date,
       default: Date.now,
