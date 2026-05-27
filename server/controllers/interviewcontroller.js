@@ -30,9 +30,12 @@ const scheduleInterview = async (req, res) => {
       status: "Scheduled",
     });
 
-    // Update application status
+    // Update application status and store details
     await Application.findByIdAndUpdate(applicationId, {
       status: "Interview Scheduled",
+      interviewDate: date,
+      interviewTime: time,
+      interviewLink: googleMeetLink,
     });
 
     res.json(interview);
@@ -173,9 +176,12 @@ const cancelInterview = async (req, res) => {
       return res.status(404).json({ error: "Interview not found" });
     }
 
-    // Update application status back to shortlisted
+    // Update application status back to shortlisted and clear interview details
     await Application.findByIdAndUpdate(interview.applicationId, {
       status: "Shortlisted",
+      interviewDate: null,
+      interviewTime: null,
+      interviewLink: null,
     });
 
     res.json(interview);

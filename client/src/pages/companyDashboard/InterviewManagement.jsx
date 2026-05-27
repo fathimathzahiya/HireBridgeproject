@@ -145,7 +145,7 @@ const InterviewManagement = () => {
       <div className="interview-header">
         <h2>Interview Management</h2>
         <button
-          className="btn-primary"
+          className="btn-primary btn-schedule-toggle"
           onClick={() => setShowScheduleForm(!showScheduleForm)}
         >
           {showScheduleForm ? "Cancel" : "+ Schedule Interview"}
@@ -230,99 +230,103 @@ const InterviewManagement = () => {
         </div>
       )}
 
-      {/* Filter Tabs */}
-      <div className="filter-tabs">
-        {statuses.map((status) => (
-          <button
-            key={status}
-            className={`filter-tab ${filterStatus === status ? "active" : ""}`}
-            onClick={() => setFilterStatus(status)}
-          >
-            {status}
-          </button>
-        ))}
-      </div>
+      {!showScheduleForm && (
+        <>
+          {/* Filter Tabs */}
+          <div className="filter-tabs">
+            {statuses.map((status) => (
+              <button
+                key={status}
+                className={`filter-tab ${filterStatus === status ? "active" : ""}`}
+                onClick={() => setFilterStatus(status)}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
 
-      {/* Interviews List */}
-      {filteredInterviews.length === 0 ? (
-        <div className="no-interviews">
-          <p>No interviews scheduled yet.</p>
-        </div>
-      ) : (
-        <div className="interviews-grid">
-          {filteredInterviews.map((interview) => (
-            <div key={interview._id} className="interview-card">
-              <div className="interview-header-card">
-                <h3>{interview.studentId?.username}</h3>
-                <span
-                  className={`status-badge ${getInterviewStatusBadge(interview.status)}`}
-                >
-                  {interview.status}
-                </span>
-              </div>
-
-              <div className="interview-details">
-                <p>
-                  <strong>Job:</strong> {interview.jobId?.title}
-                </p>
-                <p>
-                  <strong>Date & Time:</strong>{" "}
-                  {formatDateTime(interview.date, interview.time)}
-                </p>
-                <p>
-                  <strong>Meet Link:</strong>{" "}
-                  <a href={interview.googleMeetLink} target="_blank" rel="noopener noreferrer">
-                    Join Meeting
-                  </a>
-                </p>
-                {interview.instructions && (
-                  <p>
-                    <strong>Instructions:</strong> {interview.instructions}
-                  </p>
-                )}
-                {interview.result !== "Pending" && (
-                  <p>
-                    <strong>Result:</strong>{" "}
-                    <span className={`result-badge ${getInterviewResultBadge(interview.result)}`}>
-                      {interview.result}
-                    </span>
-                  </p>
-                )}
-                {interview.feedback && (
-                  <p>
-                    <strong>Feedback:</strong> {interview.feedback}
-                  </p>
-                )}
-              </div>
-
-              {interview.status === "Completed" && interview.result === "Pending" && (
-                <div className="interview-actions">
-                  <button
-                    className="btn-select"
-                    onClick={() => handleUpdateResult(interview._id, "Selected", "")}
-                  >
-                    Mark as Selected
-                  </button>
-                  <button
-                    className="btn-reject"
-                    onClick={() => handleUpdateResult(interview._id, "Rejected", "")}
-                  >
-                    Mark as Rejected
-                  </button>
-                </div>
-              )}
-
-              {interview.status === "Scheduled" && (
-                <button
-                  className="btn-cancel"
-                  onClick={() => handleCancelInterview(interview._id)}
-                >
-                  Cancel Interview
-                </button>
-              )}
+          {/* Interviews List */}
+          {filteredInterviews.length === 0 ? (
+            <div className="no-interviews">
+              <p>No interviews scheduled yet.</p>
             </div>
-          ))}
-        </div>
+          ) : (
+            <div className="interviews-grid">
+              {filteredInterviews.map((interview) => (
+                <div key={interview._id} className="interview-card">
+                  <div className="interview-header-card">
+                    <h3>{interview.studentId?.username}</h3>
+                    <span
+                      className={`status-badge ${getInterviewStatusBadge(interview.status)}`}
+                    >
+                      {interview.status}
+                    </span>
+                  </div>
+
+                  <div className="interview-details">
+                    <p>
+                      <strong>Job:</strong> {interview.jobId?.title}
+                    </p>
+                    <p>
+                      <strong>Date & Time:</strong>{" "}
+                      {formatDateTime(interview.date, interview.time)}
+                    </p>
+                    <p>
+                      <strong>Meet Link:</strong>{" "}
+                      <a href={interview.googleMeetLink} target="_blank" rel="noopener noreferrer">
+                        Join Meeting
+                      </a>
+                    </p>
+                    {interview.instructions && (
+                      <p>
+                        <strong>Instructions:</strong> {interview.instructions}
+                      </p>
+                    )}
+                    {interview.result !== "Pending" && (
+                      <p>
+                        <strong>Result:</strong>{" "}
+                        <span className={`result-badge ${getInterviewResultBadge(interview.result)}`}>
+                          {interview.result}
+                        </span>
+                      </p>
+                    )}
+                    {interview.feedback && (
+                      <p>
+                        <strong>Feedback:</strong> {interview.feedback}
+                      </p>
+                    )}
+                  </div>
+
+                  {interview.status === "Completed" && interview.result === "Pending" && (
+                    <div className="interview-actions">
+                      <button
+                        className="btn-select"
+                        onClick={() => handleUpdateResult(interview._id, "Selected", "")}
+                      >
+                        Mark as Selected
+                      </button>
+                      <button
+                        className="btn-reject"
+                        onClick={() => handleUpdateResult(interview._id, "Rejected", "")}
+                      >
+                        Mark as Rejected
+                      </button>
+                    </div>
+                  )}
+
+                  {interview.status === "Scheduled" && (
+                    <button
+                      className="btn-cancel"
+                      onClick={() => handleCancelInterview(interview._id)}
+                    >
+                      Cancel Interview
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

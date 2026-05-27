@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import ProfilePopup from "../../components/ProfilePopup/ProfilePopup";
-import EditProfile from "../../components/ProfilePopup/EditProfile";
 import ConfirmLogout from "../../components/ConfirmLogout/ConfirmLogout";
+import { studentAPI } from "../../utils/studentDashboardAPI";
 import "./StudentDashboard.css";
 
 function StudentDashboardLayout({ children }) {
@@ -10,7 +10,6 @@ function StudentDashboardLayout({ children }) {
   const location = useLocation();
   const [studentData, setStudentData] = useState(null);
   const [showProfilePopup, setShowProfilePopup] = useState(false);
-  const [showEditProfile, setShowEditProfile] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -37,14 +36,7 @@ function StudentDashboardLayout({ children }) {
         return;
       }
 
-      const response = await fetch(
-        `http://localhost:5000/api/student/getsinglestudent/${studentId}`
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch student data");
-      }
-
-      const data = await response.json();
+      const data = await studentAPI.getStudent(studentId);
       setStudentData(data);
     } catch (error) {
       console.error("Error fetching student data:", error);
@@ -89,11 +81,6 @@ function StudentDashboardLayout({ children }) {
     setShowProfilePopup(true);
   };
 
-  const handleEditProfile = () => {
-    setShowProfilePopup(false);
-    setShowEditProfile(true);
-  };
-
   const handleSaveProfile = (updatedData) => {
     setStudentData(updatedData);
   };
@@ -133,20 +120,12 @@ function StudentDashboardLayout({ children }) {
       <div className="main-content">
         {/* Navbar */}
         <div className="topbar">
-          <div className="nav-links">
-            <Link to="/student-dashboard">Dashboard</Link>
-            <Link to="/student-dashboard/jobs">Jobs</Link>
-            <Link to="/resources">Resources</Link>
+          <div className="topbar-left">
+            {/* Minimal left side */}
           </div>
 
           <div className="top-right">
-            <input
-              type="text"
-              placeholder="Search for opportunities..."
-            />
-
             <span>🔔</span>
-            <span>⚙</span>
 
             <div className="profile-section">
               <span className="student-name">
@@ -179,15 +158,6 @@ function StudentDashboardLayout({ children }) {
         <ProfilePopup
           studentData={studentData}
           onClose={() => setShowProfilePopup(false)}
-          onEdit={handleEditProfile}
-        />
-      )}
-
-      {/* Edit Profile Modal */}
-      {showEditProfile && (
-        <EditProfile
-          studentData={studentData}
-          onClose={() => setShowEditProfile(false)}
           onSave={handleSaveProfile}
         />
       )}

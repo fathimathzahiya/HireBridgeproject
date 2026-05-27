@@ -17,9 +17,41 @@ function EditProfile({ studentData, onClose, onSave }) {
   });
 
   const [resumeFile, setResumeFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(
+    studentData?.profileImage
+      ? studentData.profileImage.startsWith("http")
+        ? studentData.profileImage
+        : `http://localhost:5000${studentData.profileImage}`
+      : ""
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file");
+        setImageFile(null);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        setImageFile(null);
+        return;
+      }
+      setImageFile(file);
+      setError("");
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,7 +98,11 @@ function EditProfile({ studentData, onClose, onSave }) {
       
       // Add text fields
       Object.keys(formData).forEach(key => {
-        if (formData[key]) {
+        if (key !== "profileImage") {
+          if (formData[key]) {
+            data.append(key, formData[key]);
+          }
+        } else if (!imageFile && formData[key]) {
           data.append(key, formData[key]);
         }
       });
@@ -76,10 +112,22 @@ function EditProfile({ studentData, onClose, onSave }) {
         data.append("resume", resumeFile);
       }
 
+      // Add profile image file if selected
+      if (imageFile) {
+        data.append("profileImage", imageFile);
+      }
+
+      const token = localStorage.getItem("hirebridge_token");
+      const headers = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
       const response = await fetch(
         `http://localhost:5000/api/student/updatestudent/${studentId}`,
         {
           method: "PUT",
+          headers,
           body: data,
         }
       );
@@ -274,14 +322,29 @@ function EditProfile({ studentData, onClose, onSave }) {
 
           <div className="form-row">
             <div className="form-group">
-              <label>Profile Image URL</label>
+              <label>Profile Image</label>
               <input
-                type="url"
-                name="profileImage"
-                value={formData.profileImage}
-                onChange={handleChange}
-                placeholder="https://example.com/image.jpg"
+                type="file"
+                name="profileImageFile"
+                accept="image/*"
+                onChange={handleImageChange}
               />
+              <p className="file-hint">Upload JPG, PNG or GIF. Max 5MB.</p>
+              {imagePreview && (
+                <div className="image-preview-container" style={{ marginTop: "10px" }}>
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "2px solid #3b82f6",
+                    }}
+                  />
+                </div>
+              )}
             </div>
           </div>
 

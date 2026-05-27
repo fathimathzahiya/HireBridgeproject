@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { jobAPI } from "../../utils/companyDashboardAPI";
 import "./JobPostings.css";
 
 const JobPostings = () => {
   const { companyId } = useParams();
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,7 +21,9 @@ const JobPostings = () => {
     minimumCGPA: "",
     department: "",
     vaccancy: "",
-    applicationDeadline: "",
+    experience: "",
+    eligibility: "",
+    additionalFields: "",
   });
 
   useEffect(() => {
@@ -73,6 +76,9 @@ const JobPostings = () => {
         department: "",
         vaccancy: "",
         applicationDeadline: "",
+        experience: "",
+        eligibility: "",
+        additionalFields: "",
       });
       setEditingJobId(null);
       setShowForm(false);
@@ -93,7 +99,10 @@ const JobPostings = () => {
       minimumCGPA: job.minimumCGPA,
       department: job.department,
       vaccancy: job.vaccancy,
-      applicationDeadline: job.applicationDeadline || "",
+      applicationDeadline: job.applicationDeadline ? job.applicationDeadline.split("T")[0] : "",
+      experience: job.experience || "",
+      eligibility: job.eligibility || "",
+      additionalFields: job.additionalFields || "",
     });
     setEditingJobId(job._id);
     setShowForm(true);
@@ -148,6 +157,9 @@ const JobPostings = () => {
                 department: "",
                 vaccancy: "",
                 applicationDeadline: "",
+                experience: "",
+                eligibility: "",
+                additionalFields: "",
               });
             }}
           >
@@ -293,6 +305,41 @@ const JobPostings = () => {
               </div>
             </div>
 
+            <div className="form-row">
+              <div className="form-group">
+                <label>Experience Required</label>
+                <input
+                  type="text"
+                  name="experience"
+                  value={formData.experience}
+                  onChange={handleInputChange}
+                  placeholder="e.g., Freshers, 2+ years"
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Eligibility Criteria</label>
+                <input
+                  type="text"
+                  name="eligibility"
+                  value={formData.eligibility}
+                  onChange={handleInputChange}
+                  placeholder="e.g., B.Tech CSE/IT with no active backlogs"
+                />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Additional Information</label>
+              <textarea
+                name="additionalFields"
+                value={formData.additionalFields}
+                onChange={handleInputChange}
+                placeholder="Any other details, terms, criteria..."
+                rows="3"
+              />
+            </div>
+
             <div className="form-actions-row">
               <button type="submit" className="btn-submit">
                 {editingJobId ? "Update Job" : "Post Job"}
@@ -312,72 +359,88 @@ const JobPostings = () => {
         </div>
       )}
 
-      <div className="jobs-grid">
-        {jobs.length === 0 ? (
-          <div className="no-jobs">
-            <p>No job postings yet. Create your first job posting!</p>
-          </div>
-        ) : (
-          jobs.map((job) => (
-            <div key={job._id} className="job-card">
-              <div className="job-header">
-                <h3>{job.title}</h3>
-                <span className={`job-status ${job.status.toLowerCase()}`}>
-                  {job.status}
-                </span>
-              </div>
-
-              <div className="job-details">
-                <p>
-                  <strong>Salary:</strong> ₹{job.salary?.toLocaleString()}
-                </p>
-                <p>
-                  <strong>Location:</strong> {job.location}
-                </p>
-                <p>
-                  <strong>Job Type:</strong> {job.jobType}
-                </p>
-                <p>
-                  <strong>Department:</strong> {job.department}
-                </p>
-                <p>
-                  <strong>Vacancies:</strong> {job.vaccancy}
-                </p>
-                <p>
-                  <strong>Min CGPA:</strong> {job.minimumCGPA}
-                </p>
-              </div>
-
-              <div className="job-description">
-                <p>{job.description.substring(0, 150)}...</p>
-              </div>
-
-              <div className="job-actions">
-                <button
-                  className="btn-edit"
-                  onClick={() => handleEdit(job)}
-                >
-                  Edit
-                </button>
-                {job.status === "Open" && (
-                  <button
-                    className="btn-close"
-                    onClick={() => handleCloseJob(job._id)}
-                  >
-                    Close
-                  </button>
-                )}
-                <button
-                  className="btn-delete"
-                  onClick={() => handleDelete(job._id)}
-                >
-                  Delete
-                </button>
-              </div>
+      {!showForm && (
+        <div className="jobs-grid">
+          {jobs.length === 0 ? (
+            <div className="no-jobs">
+              <p>No job postings yet. Create your first job posting!</p>
             </div>
-          ))
-        )}
-      </div>
+          ) : (
+            jobs.map((job) => (
+              <div
+                key={job._id}
+                className="job-card"
+                onClick={() => navigate(`/company/${companyId}/jobs/${job._id}`)}
+                style={{ cursor: "pointer" }}
+              >
+                <div className="job-header">
+                  <h3>{job.title}</h3>
+                  <span className={`job-status ${job.status.toLowerCase()}`}>
+                    {job.status}
+                  </span>
+                </div>
+
+                <div className="job-details">
+                  <p>
+                    <strong>Salary:</strong> ₹{job.salary?.toLocaleString()}
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {job.location}
+                  </p>
+                  <p>
+                    <strong>Job Type:</strong> {job.jobType}
+                  </p>
+                  <p>
+                    <strong>Department:</strong> {job.department}
+                  </p>
+                  <p>
+                    <strong>Vacancies:</strong> {job.vaccancy}
+                  </p>
+                  <p>
+                    <strong>Min CGPA:</strong> {job.minimumCGPA}
+                  </p>
+                </div>
+
+                <div className="job-description">
+                  <p>{job.description.substring(0, 150)}...</p>
+                </div>
+
+                <div className="job-actions">
+                  <button
+                    className="btn-edit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleEdit(job);
+                    }}
+                  >
+                    Edit
+                  </button>
+                  {job.status === "Open" && (
+                    <button
+                      className="btn-close"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCloseJob(job._id);
+                      }}
+                    >
+                      Close
+                    </button>
+                  )}
+                  <button
+                    className="btn-delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(job._id);
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 };

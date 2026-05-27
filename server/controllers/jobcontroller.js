@@ -92,6 +92,9 @@ const createJob = async (req, res) => {
       department,
       vaccancy,
       applicationDeadline,
+      experience,
+      eligibility,
+      additionalFields,
     } = req.body;
 
     if (
@@ -121,6 +124,9 @@ const createJob = async (req, res) => {
       department,
       vaccancy,
       applicationDeadline,
+      experience,
+      eligibility,
+      additionalFields,
       status: "Open",
     });
 
@@ -161,6 +167,9 @@ const updateJob = async (req, res) => {
       vaccancy,
       applicationDeadline,
       status,
+      experience,
+      eligibility,
+      additionalFields,
     } = req.body;
 
     const job = await Job.findByIdAndUpdate(
@@ -177,6 +186,9 @@ const updateJob = async (req, res) => {
         vaccancy,
         applicationDeadline,
         status,
+        experience,
+        eligibility,
+        additionalFields,
         updatedAt: new Date(),
       },
       { new: true }

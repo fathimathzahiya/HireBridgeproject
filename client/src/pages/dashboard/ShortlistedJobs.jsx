@@ -103,28 +103,6 @@ function ShortlistedJobs() {
                       <p><strong>Recruiter Feedback:</strong> {application.notes}</p>
                     </div>
                   )}
-                  {application.status === "Interview Scheduled" && application.interviewLink && (
-                    <div className="description" style={{ background: "#f5f3ff", borderLeft: "4px solid #7c3aed", marginTop: "15px", padding: "12px", borderRadius: "4px" }}>
-                      <h4 style={{ margin: "0 0 8px 0", color: "#6d28d9", fontSize: "14px" }}>📅 Interview Details</h4>
-                      <p style={{ margin: "4px 0", fontSize: "13px" }}>
-                        <strong>Platform Link:</strong>{" "}
-                        <a 
-                          href={application.interviewLink.startsWith("http") ? application.interviewLink : `https://${application.interviewLink}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          style={{ color: "#7c3aed", textDecoration: "underline", fontWeight: "bold" }}
-                        >
-                          Join Interview Platform
-                        </a>
-                      </p>
-                      <p style={{ margin: "4px 0", fontSize: "13px" }}>
-                        <strong>Date:</strong> {formatDateToDDMMYYYY(application.interviewDate)}
-                      </p>
-                      <p style={{ margin: "4px 0", fontSize: "13px" }}>
-                        <strong>Time:</strong> {application.interviewTime}
-                      </p>
-                    </div>
-                  )}
                   <div className="job-actions">
                     <button className="btn-primary">View Details</button>
                     <button className="btn-secondary" style={{ cursor: "not-allowed", opacity: 0.6 }} disabled>

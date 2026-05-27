@@ -6,6 +6,7 @@ import JobPostings from "./JobPostings";
 import Applicants from "./Applicants";
 import InterviewManagement from "./InterviewManagement";
 import CompanyProfile from "./CompanyProfile";
+import SingleJobView from "./SingleJobView";
 
 const CompanyDashboardRouter = () => {
   return (
@@ -13,6 +14,7 @@ const CompanyDashboardRouter = () => {
       <Routes>
         <Route path="/overview" element={<CompanyDashboardOverview />} />
         <Route path="/jobs" element={<JobPostings />} />
+        <Route path="/jobs/:jobId" element={<SingleJobView />} />
         <Route path="/applicants" element={<Applicants />} />
         <Route path="/interviews" element={<InterviewManagement />} />
         <Route path="/profile" element={<CompanyProfile />} />

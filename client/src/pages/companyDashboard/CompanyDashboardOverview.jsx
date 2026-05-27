@@ -129,7 +129,7 @@ const CompanyDashboardOverview = () => {
           </Link>
           <Link to={`/company/${companyId}/profile`} className="action-btn quaternary">
             <span>⚙️</span>
-            Edit Profile
+            Company Profile
           </Link>
         </div>
       </section>

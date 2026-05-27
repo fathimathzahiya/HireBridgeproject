@@ -65,6 +65,21 @@ const jobSchema = new Schema(
       default: "Open",
     },
 
+    experience: {
+      type: String,
+      required: false,
+    },
+
+    eligibility: {
+      type: String,
+      required: false,
+    },
+
+    additionalFields: {
+      type: String,
+      required: false,
+    },
+
     createdAt: {
       type: Date,
       default: Date.now,

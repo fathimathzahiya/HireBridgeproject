@@ -72,33 +72,19 @@ const getSingleCompany = async (req, res) => {
 const updateCompanyProfile = async (req, res) => {
   try {
     const { companyId } = req.params;
-    const {
-      name,
-      website,
-      location,
-      industry,
-      companySize,
-      HRName,
-      HREmail,
-      phoneNumber,
-      companyLogo,
-      aboutCompany,
-    } = req.body;
+    
+    // Prepare update data from request body
+    const updateData = { ...req.body };
+
+    // Process file uploads if they exist
+    if (req.files && req.files.companyLogo && req.files.companyLogo[0]) {
+      updateData.companyLogo = `/uploads/${req.files.companyLogo[0].filename}`;
+      console.log('Company logo uploaded:', updateData.companyLogo);
+    }
 
     const company = await Company.findByIdAndUpdate(
       companyId,
-      {
-        name,
-        website,
-        location,
-        industry,
-        companySize,
-        HRName,
-        HREmail,
-        phoneNumber,
-        companyLogo,
-        aboutCompany,
-      },
+      updateData,
       { new: true }
     );
 
