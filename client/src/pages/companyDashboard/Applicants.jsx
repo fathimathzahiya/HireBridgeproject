@@ -5,6 +5,7 @@ import {
   getApplicationStatusColor,
   sortApplicantsByDate,
 } from "../../utils/companyDashboardAPI";
+import { formatDateToDDMMYYYY } from "../../utils/dateFormatter";
 import "./Applicants.css";
 
 const Applicants = () => {
@@ -16,6 +17,13 @@ const Applicants = () => {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [noteText, setNoteText] = useState("");
+  
+  // Interview scheduling modal states
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [schedulingApplicantId, setSchedulingApplicantId] = useState(null);
+  const [schedLink, setSchedLink] = useState("");
+  const [schedDate, setSchedDate] = useState("");
+  const [schedTime, setSchedTime] = useState("");
 
   const statuses = [
     "All",
@@ -54,6 +62,14 @@ const Applicants = () => {
   };
 
   const handleStatusChange = async (applicantId, newStatus) => {
+    if (newStatus === "Interview Scheduled") {
+      setSchedulingApplicantId(applicantId);
+      setSchedLink("");
+      setSchedDate("");
+      setSchedTime("");
+      setShowScheduleModal(true);
+      return;
+    }
     try {
       await applicationAPI.updateApplicationStatus(applicantId, {
         status: newStatus,
@@ -62,6 +78,27 @@ const Applicants = () => {
       fetchApplicants();
     } catch (err) {
       alert("Error updating status: " + err.message);
+    }
+  };
+
+  const handleScheduleSubmit = async (e) => {
+    e.preventDefault();
+    if (!schedLink || !schedDate || !schedTime) {
+      alert("Please fill in all interview fields.");
+      return;
+    }
+    try {
+      await applicationAPI.updateApplicationStatus(schedulingApplicantId, {
+        status: "Interview Scheduled",
+        interviewLink: schedLink,
+        interviewDate: schedDate,
+        interviewTime: schedTime,
+      });
+      alert("Interview scheduled successfully!");
+      setShowScheduleModal(false);
+      fetchApplicants();
+    } catch (err) {
+      alert("Error scheduling interview: " + err.message);
     }
   };
 
@@ -138,7 +175,7 @@ const Applicants = () => {
                 <div className="detail-item">
                   <span className="label">Applied On:</span>
                   <span className="value">
-                    {new Date(applicant.appliedAt).toLocaleDateString()}
+                    {formatDateToDDMMYYYY(applicant.appliedAt)}
                   </span>
                 </div>
                 <div className="detail-item">
@@ -233,12 +270,30 @@ const Applicants = () => {
               </p>
               <p>
                 <strong>Applied On:</strong>{" "}
-                {new Date(selectedApplicant.appliedAt).toLocaleDateString()}
+                {formatDateToDDMMYYYY(selectedApplicant.appliedAt)}
               </p>
               <p>
                 <strong>Status:</strong> {selectedApplicant.status}
               </p>
             </div>
+
+            {selectedApplicant.status === "Interview Scheduled" && selectedApplicant.interviewLink && (
+              <div className="detail-section" style={{ background: "#f5f3ff", borderLeft: "4px solid #7c3aed", padding: "12px", borderRadius: "4px" }}>
+                <h4 style={{ color: "#6d28d9", margin: "0 0 8px 0" }}>📅 Interview Details</h4>
+                <p>
+                  <strong>Platform Link:</strong>{" "}
+                  <a href={selectedApplicant.interviewLink.startsWith("http") ? selectedApplicant.interviewLink : `https://${selectedApplicant.interviewLink}`} target="_blank" rel="noopener noreferrer" style={{ color: "#7c3aed", textDecoration: "underline", fontWeight: "bold" }}>
+                    Join Platform Link
+                  </a>
+                </p>
+                <p>
+                  <strong>Date:</strong> {formatDateToDDMMYYYY(selectedApplicant.interviewDate)}
+                </p>
+                <p>
+                  <strong>Time:</strong> {selectedApplicant.interviewTime}
+                </p>
+              </div>
+            )}
 
             <div className="detail-section">
               <h4>Student Profile</h4>
@@ -286,6 +341,83 @@ const Applicants = () => {
                 </button>
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Interview Scheduling Modal */}
+      {showScheduleModal && (
+        <div className="modal-overlay" onClick={() => setShowScheduleModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button
+              className="close-btn"
+              onClick={() => setShowScheduleModal(false)}
+            >
+              ×
+            </button>
+
+            <h3 style={{ margin: "0 0 10px 0", fontSize: "20px" }}>📅 Schedule Interview</h3>
+            <p style={{ marginBottom: "20px", color: "#666", fontSize: "14px" }}>
+              Please specify the platform link, date, and time for the student's interview.
+            </p>
+
+            <form onSubmit={handleScheduleSubmit}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                  <label style={{ fontWeight: "600", fontSize: "14px" }}>Interview Link (Google Meet/Zoom/etc.) *</label>
+                  <input
+                    type="url"
+                    required
+                    value={schedLink}
+                    onChange={(e) => setSchedLink(e.target.value)}
+                    placeholder="https://meet.google.com/..."
+                    style={{ padding: "10px", borderRadius: "4px", border: "1px solid #ccc", fontSize: "14px", width: "100%", boxSizing: "border-box" }}
+                  />
+                </div>
+
+                <div style={{ display: "flex", gap: "15px" }}>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", flex: 1 }}>
+                    <label style={{ fontWeight: "600", fontSize: "14px" }}>Date *</label>
+                    <input
+                      type="date"
+                      required
+                      value={schedDate}
+                      onChange={(e) => setSchedDate(e.target.value)}
+                      style={{ padding: "10px", borderRadius: "4px", border: "1px solid #ccc", fontSize: "14px", width: "100%", boxSizing: "border-box" }}
+                    />
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "5px", flex: 1 }}>
+                    <label style={{ fontWeight: "600", fontSize: "14px" }}>Time *</label>
+                    <input
+                      type="time"
+                      required
+                      value={schedTime}
+                      onChange={(e) => setSchedTime(e.target.value)}
+                      style={{ padding: "10px", borderRadius: "4px", border: "1px solid #ccc", fontSize: "14px", width: "100%", boxSizing: "border-box" }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "25px" }}>
+                <button
+                  type="button"
+                  className="btn-note"
+                  style={{ margin: 0, padding: "8px 16px" }}
+                  onClick={() => setShowScheduleModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-view"
+                  style={{ margin: 0, padding: "8px 16px", backgroundColor: "#7c3aed", color: "white", border: "none" }}
+                >
+                  Schedule Interview
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

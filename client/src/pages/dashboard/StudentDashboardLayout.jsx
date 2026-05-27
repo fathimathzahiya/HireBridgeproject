@@ -123,9 +123,6 @@ function StudentDashboardLayout({ children }) {
           <p onClick={() => navigate("/settings")} style={{ cursor: "pointer" }}>
             ⚙ Settings
           </p>
-          <p onClick={() => navigate("/help")} style={{ cursor: "pointer" }}>
-            ❓ Help Center
-          </p>
           <p onClick={handleLogout} style={{ cursor: "pointer", color: "#d32f2f", fontWeight: "bold" }}>
             🚪 Logout
           </p>

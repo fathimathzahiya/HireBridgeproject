@@ -135,11 +135,17 @@ const getCompanyApplicantsByStatus = async (req, res) => {
 const updateApplicationStatus = async (req, res) => {
   try {
     const { applicationId } = req.params;
-    const { status, notes } = req.body;
+    const { status, notes, interviewLink, interviewDate, interviewTime } = req.body;
+
+    const updateFields = { status };
+    if (notes !== undefined) updateFields.notes = notes;
+    if (interviewLink !== undefined) updateFields.interviewLink = interviewLink;
+    if (interviewDate !== undefined) updateFields.interviewDate = interviewDate;
+    if (interviewTime !== undefined) updateFields.interviewTime = interviewTime;
 
     const application = await Application.findByIdAndUpdate(
       applicationId,
-      { status, notes },
+      updateFields,
       { new: true }
     )
       .populate("studentId")
@@ -148,6 +154,24 @@ const updateApplicationStatus = async (req, res) => {
 
     if (!application) {
       return res.status(404).json({ error: "Application not found" });
+    }
+
+    // If status is Interview Scheduled, automatically create or update an Interview entry
+    if (status === "Interview Scheduled" && interviewLink && interviewDate && interviewTime) {
+      const Interview = require("../models/interviewmodel");
+      await Interview.findOneAndUpdate(
+        { applicationId },
+        {
+          studentId: application.studentId._id || application.studentId,
+          companyId: application.companyId._id || application.companyId,
+          jobId: application.jobId._id || application.jobId,
+          date: interviewDate,
+          time: interviewTime,
+          googleMeetLink: interviewLink,
+          status: "Scheduled",
+        },
+        { upsert: true, new: true }
+      );
     }
 
     res.json(application);

@@ -31,6 +31,21 @@ const applicationSchema = new Schema(
       default: Date.now,
     },
 
+    interviewLink: {
+      type: String,
+      required: false,
+    },
+
+    interviewDate: {
+      type: String,
+      required: false,
+    },
+
+    interviewTime: {
+      type: String,
+      required: false,
+    },
+
     notes: {
       type: String,
       required: false,

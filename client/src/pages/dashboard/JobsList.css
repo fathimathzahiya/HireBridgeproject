@@ -59,6 +59,14 @@
   background: #e74c3c;
 }
 
+.status.under-review {
+  background: #f39c12;
+}
+
+.status.interview-scheduled {
+  background: #9b59b6;
+}
+
 .job-card p {
   margin: 8px 0;
   color: #555;

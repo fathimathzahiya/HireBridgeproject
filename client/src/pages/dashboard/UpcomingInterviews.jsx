@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import StudentDashboardLayout from "./StudentDashboardLayout";
+import { formatDateToDDMMYYYY } from "../../utils/dateFormatter";
 import "./InterviewsList.css";
 
 function UpcomingInterviews() {
@@ -90,7 +91,7 @@ function UpcomingInterviews() {
                 <div className="interview-details">
                   <div className="detail-row">
                     <strong>📅 Date:</strong>
-                    <span>{new Date(interview.date).toLocaleDateString()}</span>
+                    <span>{formatDateToDDMMYYYY(interview.date)}</span>
                   </div>
 
                   <div className="detail-row">

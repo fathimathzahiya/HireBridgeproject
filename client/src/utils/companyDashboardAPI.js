@@ -1,5 +1,6 @@
 // API configuration and utility functions for company dashboard
 import axios from "axios";
+import { formatDateToDDMMYYYY } from "./dateFormatter";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -202,13 +203,7 @@ export const getInterviewResultBadge = (result) => {
 
 // Format date time
 export const formatDateTime = (date, time) => {
-  const dateObj = new Date(date);
-  const formatted = dateObj.toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-  });
-  return `${formatted} at ${time}`;
+  return `${formatDateToDDMMYYYY(date)} at ${time}`;
 };
 
 // Get days until deadline

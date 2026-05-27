@@ -138,9 +138,6 @@ const CompanyDashboardLayout = ({ children }) => {
               onClick={() => setShowProfilePopup(true)}
               title="Click to view profile"
             />
-            <button className="header-logout-btn" onClick={handleLogout}>
-              Logout
-            </button>
           </div>
         </header>
 
