@@ -83,6 +83,12 @@ const studentSchema = new Schema(
       default: "https://i.pravatar.cc/150",
     },
 
+    // ========== ACCOUNT CONTROL ==========
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+
     // ========== METADATA ==========
     createdAt: {
       type: Date,

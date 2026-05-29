@@ -5,23 +5,22 @@ import { applicationAPI } from "../../utils/studentDashboardAPI";
 import { formatDateToDDMMYYYY } from "../../utils/dateFormatter";
 import "./JobsList.css";
 
-function AppliedJobs() {
+function SelectedJobs() {
   const [applications, setApplications] = useState([]);
   const [filteredApplications, setFilteredApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedFilter, setSelectedFilter] = useState("All");
 
   useEffect(() => {
-    fetchAppliedJobs();
+    fetchSelectedJobs();
   }, []);
 
   useEffect(() => {
-    filterAndSearchApplications();
-  }, [applications, searchTerm, selectedFilter]);
+    filterApplications();
+  }, [applications, searchTerm]);
 
-  const fetchAppliedJobs = async () => {
+  const fetchSelectedJobs = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -33,24 +32,19 @@ function AppliedJobs() {
         return;
       }
 
-      // Fetch student applications
-      const studentApps = await applicationAPI.getStudentApplications(studentId);
+      // Fetch student applications with "Selected" status
+      const studentApps = await applicationAPI.getStudentApplicationsByStatus(studentId, "Selected");
       setApplications(studentApps);
     } catch (err) {
-      console.error("Error fetching applied jobs:", err);
-      setError(err.message || "Failed to fetch applied jobs.");
+      console.error("Error fetching selected jobs:", err);
+      setError(err.message || "Failed to fetch selected jobs.");
     } finally {
       setLoading(false);
     }
   };
 
-  const filterAndSearchApplications = () => {
+  const filterApplications = () => {
     let filtered = applications;
-
-    // Apply status filter
-    if (selectedFilter !== "All") {
-      filtered = filtered.filter(app => app.status === selectedFilter);
-    }
 
     // Apply search filter
     if (searchTerm.trim()) {
@@ -69,17 +63,16 @@ function AppliedJobs() {
     setFilteredApplications(filtered);
   };
 
-  // Helper function to render status color
   const getStatusClass = (status) => {
     switch (status) {
       case "Selected":
-        return "status shortlisted"; // Reuse green color
+        return "status shortlisted";
       case "Rejected":
-        return "status rejected-status"; // Red color
+        return "status rejected-status";
       case "Under Review":
-        return "status under-review"; // Orange
+        return "status under-review";
       case "Interview Scheduled":
-        return "status interview-scheduled"; // Purple
+        return "status interview-scheduled";
       default:
         return "status";
     }
@@ -89,11 +82,11 @@ function AppliedJobs() {
     <StudentDashboardLayout>
       <div>
         <div className="welcome">
-          <h1>Applied Jobs</h1>
-          <p>View all the jobs you have applied to</p>
+          <h1>Selected Jobs</h1>
+          <p>View all the jobs where you have been selected</p>
         </div>
 
-        {/* Search and Filter Section */}
+        {/* Search Bar */}
         <div className="search-filter-container" style={{
           display: "flex",
           gap: "15px",
@@ -115,40 +108,22 @@ function AppliedJobs() {
               fontSize: "14px"
             }}
           />
-          <select
-            value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}
-            style={{
-              padding: "10px 15px",
-              border: "1px solid #ddd",
-              borderRadius: "5px",
-              fontSize: "14px",
-              minWidth: "150px"
-            }}
-          >
-            <option value="All">All Status</option>
-            <option value="Applied">Applied</option>
-            <option value="Under Review">Under Review</option>
-            <option value="Interview Scheduled">Interview Scheduled</option>
-            <option value="Selected">Selected</option>
-            <option value="Rejected">Rejected</option>
-          </select>
         </div>
 
         {loading ? (
-          <p>Loading applied jobs...</p>
+          <p>Loading selected jobs...</p>
         ) : error ? (
           <div className="no-data">
             <p>⚠️ {error}</p>
           </div>
         ) : filteredApplications.length === 0 ? (
           <div className="no-data">
-            <p>{searchTerm || selectedFilter !== "All" ? "No jobs match your search or filter." : "You haven't applied to any jobs yet."}</p>
+            <p>{searchTerm ? "No selected jobs match your search." : "You haven't been selected for any jobs yet."}</p>
           </div>
         ) : (
           <div className="jobs-list">
             <p style={{ marginBottom: "15px", color: "#666" }}>
-              Showing {filteredApplications.length} of {applications.length} applications
+              Showing {filteredApplications.length} selected job(s)
             </p>
             {filteredApplications.map((application) => {
               const job = application.jobId;
@@ -160,7 +135,7 @@ function AppliedJobs() {
                   <div className="job-header">
                     <h3>{job?.title || "Role Title"}</h3>
                     <span className={getStatusClass(application.status)}>
-                      {application.status}
+                      ✓ {application.status}
                     </span>
                   </div>
                   <p className="company"><strong>Company:</strong> {companyName}</p>
@@ -174,8 +149,8 @@ function AppliedJobs() {
                     <p><strong>Description:</strong> {job?.description || "No description provided."}</p>
                   </div>
                   {application.notes && (
-                    <div className="description" style={{ background: "#fffbeb", borderLeft: "4px solid #f59e0b" }}>
-                      <p><strong>Recruiter Feedback:</strong> {application.notes}</p>
+                    <div className="description" style={{ background: "#d4edda", borderLeft: "4px solid #28a745" }}>
+                      <p><strong>Company Message:</strong> {application.notes}</p>
                     </div>
                   )}
                 </div>
@@ -188,5 +163,4 @@ function AppliedJobs() {
   );
 }
 
-export default AppliedJobs;
-
+export default SelectedJobs;

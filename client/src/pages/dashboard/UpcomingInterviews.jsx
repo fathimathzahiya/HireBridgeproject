@@ -27,12 +27,14 @@ function UpcomingInterviews() {
       // Fetch interviews via authenticated API
       const allInterviews = await interviewAPI.getStudentInterviews(studentId);
 
-      // Sort by date (upcoming first)
-      const sortedInterviews = allInterviews.sort((a, b) => {
-        return new Date(a.date) - new Date(b.date);
-      });
+      // Filter out completed interviews and sort by date (upcoming first)
+      const upcomingInterviews = allInterviews
+        .filter(interview => getTimeStatus(interview.date, interview.time) !== "completed")
+        .sort((a, b) => {
+          return new Date(a.date) - new Date(b.date);
+        });
 
-      setInterviews(sortedInterviews);
+      setInterviews(upcomingInterviews);
     } catch (err) {
       console.error("Error fetching interviews:", err);
       setError(err.message || "Failed to load interviews.");
@@ -143,10 +145,11 @@ function UpcomingInterviews() {
                   <div className="interview-actions">
                     {interview.googleMeetLink && (
                       <a 
-                        href={interview.googleMeetLink.startsWith("http") ? interview.googleMeetLink : `https://${interview.googleMeetLink}`} 
-                        target="_blank" 
+                        href={interview.googleMeetLink.startsWith("http") ? interview.googleMeetLink : `https://${interview.googleMeetLink}`}
+                        target="_blank"
                         rel="noopener noreferrer" 
                         className="btn-primary"
+                        title="Join Interview"
                       >
                         Join Interview
                       </a>

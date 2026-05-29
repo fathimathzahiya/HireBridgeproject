@@ -94,6 +94,16 @@ const companySchema = new Schema(
       required: false,
     },
 
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
+
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+
     createdAt: {
       type: Date,
       default: Date.now,

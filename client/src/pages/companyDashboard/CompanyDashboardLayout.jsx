@@ -125,19 +125,6 @@ const CompanyDashboardLayout = ({ children }) => {
           </div>
           <div className="header-right">
             <span className="company-name">{companyName}</span>
-            <img
-              src={
-                companyData?.companyLogo
-                  ? companyData.companyLogo.startsWith("http")
-                    ? companyData.companyLogo
-                    : `http://localhost:5000${companyData.companyLogo}`
-                  : "https://via.placeholder.com/40?text=" + encodeURIComponent(companyName.substring(0, 1))
-              }
-              alt="company logo"
-              className="header-company-logo"
-              onClick={() => setShowProfilePopup(true)}
-              title="Click to view profile"
-            />
           </div>
         </header>
 
@@ -145,9 +132,10 @@ const CompanyDashboardLayout = ({ children }) => {
       </main>
 
       {/* Company Profile Popup */}
-      {showProfilePopup && companyData && (
+      {showProfilePopup && (
         <CompanyProfilePopup
           companyData={companyData}
+          loading={loading}
           onClose={() => setShowProfilePopup(false)}
           onEdit={() => {
             setShowProfilePopup(false);

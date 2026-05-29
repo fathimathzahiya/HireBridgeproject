@@ -28,10 +28,36 @@ const interviewroute = require("./routes/interviewrouter");
 app.use("/api", interviewroute);
 const notificationroute = require("./routes/notificationrouter");
 app.use("/api", notificationroute);
+const adminroute = require("./routes/adminroutes");
+app.use("/api/admin", adminroute);
+
+// Automatic Admin account seeding routine
+const seedAdmin = async () => {
+  try {
+    const Admin = require("./models/adminmodel");
+    const bcrypt = require("bcryptjs");
+    
+    const adminCount = await Admin.countDocuments();
+    if (adminCount === 0) {
+      const hashedPassword = await bcrypt.hash("adminpassword123", 10);
+      await Admin.create({
+        name: "Placement Admin",
+        email: "admin@hirebridge.com",
+        password: hashedPassword,
+        profileImage: "https://i.pravatar.cc/150?img=60",
+        role: "admin",
+      });
+      console.log("Admin account successfully seeded: admin@hirebridge.com / adminpassword123");
+    }
+  } catch (error) {
+    console.error("Admin account seeding failure:", error);
+  }
+};
 
 app.listen(5000, () => {
   console.log("server running");
   console.log("mongoDB connected");
+  seedAdmin();
 });
 
 module.exports = connectDB;

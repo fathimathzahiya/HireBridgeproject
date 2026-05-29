@@ -19,6 +19,7 @@ function StudentDashboardLayout({ children }) {
     { label: "Dashboard Overview", path: "/student-dashboard" },
     { label: "Jobs", path: "/student-dashboard/jobs" },
     { label: "Applied Jobs", path: "/student-dashboard/applied-jobs" },
+    { label: "Selected Jobs", path: "/student-dashboard/selected-jobs" },
     { label: "Shortlisted Jobs", path: "/student-dashboard/shortlisted-jobs" },
     { label: "Rejected Jobs", path: "/student-dashboard/rejected-jobs" },
     { label: "Upcoming Interviews", path: "/student-dashboard/upcoming-interviews" },

@@ -7,10 +7,15 @@ import "./Jobs.css";
 
 function Jobs() {
   const [jobs, setJobs] = useState([]);
+  const [filteredJobs, setFilteredJobs] = useState([]);
   const [appliedJobs, setAppliedJobs] = useState([]);
   const [student, setStudent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Search and filter states
+  const [searchTerm, setSearchTerm] = useState("");
+  const [cgpaFilter, setCgpaFilter] = useState("");
   
   // Interactive detail/apply modal states
   const [showDetailsModal, setShowDetailsModal] = useState(false);
@@ -34,6 +39,32 @@ function Jobs() {
       setLoading(false);
     }
   }, [studentId]);
+
+  useEffect(() => {
+    filterJobs();
+  }, [jobs, searchTerm, cgpaFilter]);
+
+  const filterJobs = () => {
+    let filtered = jobs;
+
+    // Filter by search term (job name, company name, and salary)
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(job => 
+        job.title.toLowerCase().includes(term) ||
+        (job.companyId?.name || "").toLowerCase().includes(term) ||
+        job.salary.toString().includes(term)
+      );
+    }
+
+    // Filter by CGPA
+    if (cgpaFilter) {
+      const minCgpa = parseFloat(cgpaFilter);
+      filtered = filtered.filter(job => job.minimumCGPA <= minCgpa);
+    }
+
+    setFilteredJobs(filtered);
+  };
 
   const fetchJobsAndStudentData = async () => {
     try {
@@ -155,8 +186,123 @@ function Jobs() {
             <p>No jobs are currently available. Check back later!</p>
           </div>
         ) : (
-          <div className="student-jobs-grid">
-            {jobs.map((job) => {
+          <>
+            {/* Search and Filter Section */}
+            <div className="search-filter-container" style={{
+              display: "flex",
+              gap: "15px",
+              marginBottom: "25px",
+              flexWrap: "wrap",
+              alignItems: "flex-end",
+              padding: "20px",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "8px",
+              border: "1px solid #e9ecef"
+            }}>
+              {/* Search Bar */}
+              <div style={{ flex: 1, minWidth: "250px" }}>
+                <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "#333" }}>
+                  🔍 Search by Job Title, Company, or Salary
+                </label>
+                <input
+                  type="text"
+                  placeholder="Search job title, company name, or salary (e.g., 10, 15)..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 15px",
+                    border: "1px solid #ddd",
+                    borderRadius: "5px",
+                    fontSize: "14px",
+                    boxSizing: "border-box"
+                  }}
+                />
+              </div>
+
+              {/* CGPA Filter */}
+              <div style={{ minWidth: "180px" }}>
+                <label style={{ display: "block", marginBottom: "8px", fontWeight: "600", fontSize: "14px", color: "#333" }}>
+                  🎓 Min CGPA Required
+                </label>
+                <select
+                  value={cgpaFilter}
+                  onChange={(e) => setCgpaFilter(e.target.value)}
+                  style={{
+                    width: "100%",
+                    padding: "12px 15px",
+                    border: "1px solid #ddd",
+                    borderRadius: "5px",
+                    fontSize: "14px",
+                    boxSizing: "border-box"
+                  }}
+                >
+                  <option value="">All CGPA</option>
+                  <option value="1.0">1.0 and above</option>
+                  <option value="1.5">1.5 and above</option>
+                  <option value="2.0">2.0 and above</option>
+                  <option value="2.5">2.5 and above</option>
+                  <option value="3.0">3.0 and above</option>
+                  <option value="3.5">3.5 and above</option>
+                  <option value="4.0">4.0 and above</option>
+                  <option value="4.5">4.5 and above</option>
+                  <option value="5.0">5.0 and above</option>
+                  <option value="5.5">5.5 and above</option>
+                  <option value="6.0">6.0 and above</option>
+                  <option value="6.5">6.5 and above</option>
+                  <option value="7.0">7.0 and above</option>
+                  <option value="7.5">7.5 and above</option>
+                  <option value="8.0">8.0 and above</option>
+                  <option value="8.5">8.5 and above</option>
+                  <option value="9.0">9.0 and above</option>
+                  <option value="9.5">9.5 and above</option>
+                  <option value="10.0">10.0</option>
+                </select>
+              </div>
+
+
+
+              {/* Clear Filters Button */}
+              <button
+                onClick={() => {
+                  setSearchTerm("");
+                  setCgpaFilter("");
+                }}
+                style={{
+                  padding: "12px 20px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                  transition: "background-color 0.3s"
+                }}
+                onMouseEnter={(e) => e.target.style.backgroundColor = "#c82333"}
+                onMouseLeave={(e) => e.target.style.backgroundColor = "#dc3545"}
+              >
+                Clear Filters
+              </button>
+            </div>
+
+            {/* Results Count and Jobs Grid */}
+            <div className="jobs-results-info" style={{
+              marginBottom: "15px",
+              color: "#666",
+              fontSize: "14px",
+              fontWeight: "500"
+            }}>
+              Showing {filteredJobs.length} of {jobs.length} available jobs
+            </div>
+
+            {filteredJobs.length === 0 ? (
+              <div className="no-data">
+                <p>No jobs match your filters. Try adjusting your search criteria.</p>
+              </div>
+            ) : (
+              <div className="student-jobs-grid">
+                {filteredJobs.map((job) => {
               const applied = isApplied(job._id);
               const eligible = isEligible(job.minimumCGPA);
               const companyName = job.companyId?.name || "Company Name";
@@ -238,6 +384,8 @@ function Jobs() {
               );
             })}
           </div>
+            )}
+          </>
         )}
 
         {/* COMBINED DETAILED & APPLY MODAL */}

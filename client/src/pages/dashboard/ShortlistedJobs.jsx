@@ -103,12 +103,6 @@ function ShortlistedJobs() {
                       <p><strong>Recruiter Feedback:</strong> {application.notes}</p>
                     </div>
                   )}
-                  <div className="job-actions">
-                    <button className="btn-primary">View Details</button>
-                    <button className="btn-secondary" style={{ cursor: "not-allowed", opacity: 0.6 }} disabled>
-                      Decline Locked
-                    </button>
-                  </div>
                 </div>
               );
             })}
