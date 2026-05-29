@@ -2,6 +2,8 @@ const express = require("express");
 const adminrouter = express.Router();
 const { protect } = require("../middleware/authMiddleware");
 const { adminOnly } = require("../middleware/adminMiddleware");
+const studentUpload = require("../config/studentMulter");
+const companyUpload = require("../config/companyMulter");
 const {
   loginAdmin,
   getAdminProfile,
@@ -27,6 +29,7 @@ const {
   completeInterview,
   getAllNotifications,
   deleteNotification,
+  markNotificationAsRead,
   getAnalyticsStats,
 } = require("../controllers/admincontroller");
 
@@ -39,7 +42,7 @@ adminrouter.put("/profile/update", protect, adminOnly, updateAdminSettings);
 
 // ===== STUDENT MANAGEMENT =====
 adminrouter.get("/students", protect, adminOnly, getAllStudents);
-adminrouter.post("/students/add", protect, adminOnly, addStudent);
+adminrouter.post("/students/add", protect, adminOnly, studentUpload.fields([{ name: "profileImage", maxCount: 1 }, { name: "resume", maxCount: 1 }, { name: "certification", maxCount: 1 }]), addStudent);
 adminrouter.get("/students/:id", protect, adminOnly, getStudentById);
 adminrouter.put("/students/:id", protect, adminOnly, updateStudent);
 adminrouter.delete("/students/:id", protect, adminOnly, deleteStudent);
@@ -47,7 +50,7 @@ adminrouter.patch("/students/block/:id", protect, adminOnly, blockStudent);
 
 // ===== COMPANY MANAGEMENT =====
 adminrouter.get("/companies", protect, adminOnly, getAllCompanies);
-adminrouter.post("/companies/add", protect, adminOnly, addCompany);
+adminrouter.post("/companies/add", protect, adminOnly, companyUpload.single("profilePhoto"), addCompany);
 adminrouter.patch("/companies/approve/:id", protect, adminOnly, approveCompany);
 adminrouter.patch("/companies/block/:id", protect, adminOnly, blockCompany);
 adminrouter.delete("/companies/:id", protect, adminOnly, deleteCompany);
@@ -68,6 +71,7 @@ adminrouter.patch("/interviews/complete/:id", protect, adminOnly, completeInterv
 
 // ===== BULLETINS & NOTIFICATIONS =====
 adminrouter.get("/notifications", protect, adminOnly, getAllNotifications);
+adminrouter.patch("/notifications/read/:id", protect, adminOnly, markNotificationAsRead);
 adminrouter.delete("/notifications/:id", protect, adminOnly, deleteNotification);
 
 // ===== ANALYTICS =====

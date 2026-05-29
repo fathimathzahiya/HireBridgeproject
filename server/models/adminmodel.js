@@ -15,10 +15,7 @@ const adminSchema = new Schema(
       type: String,
       required: true,
     },
-    profileImage: {
-      type: String,
-      default: "https://i.pravatar.cc/150?img=60",
-    },
+
     role: {
       type: String,
       default: "admin",

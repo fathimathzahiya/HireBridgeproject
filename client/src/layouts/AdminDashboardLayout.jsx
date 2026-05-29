@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { adminService } from "../services/adminService";
+import { toast } from "react-toastify";
 import { useAdminAuth } from "../context/AdminAuthContext";
 import {
   LayoutDashboard,
@@ -17,7 +19,9 @@ import {
   Search,
   Sun,
   Moon,
-  ChevronDown
+  ChevronDown,
+  Trash2,
+  Check
 } from "lucide-react";
 
 export const AdminDashboardLayout = ({ children }) => {
@@ -28,7 +32,8 @@ export const AdminDashboardLayout = ({ children }) => {
   const [darkMode, setDarkMode] = useState(() => {
     return localStorage.getItem("admin_theme") === "dark";
   });
-  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const menuItems = [
@@ -38,7 +43,6 @@ export const AdminDashboardLayout = ({ children }) => {
     { id: "jobs", label: "Jobs", icon: Briefcase, path: "/admin/jobs" },
     { id: "applications", label: "Applications", icon: FileSpreadsheet, path: "/admin/applications" },
     { id: "interviews", label: "Interviews", icon: Calendar, path: "/admin/interviews" },
-    { id: "notifications", label: "Notifications", icon: Bell, path: "/admin/notifications" },
     { id: "settings", label: "Settings", icon: Settings, path: "/admin/settings" },
   ];
 
@@ -55,6 +59,44 @@ export const AdminDashboardLayout = ({ children }) => {
   const isActiveMenu = (path) => {
     return location.pathname === path;
   };
+
+  const fetchNotifications = async () => {
+    try {
+      const data = await adminService.getAllNotifications();
+      setNotifications(data);
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000); // Polling every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleMarkAsRead = async (id, e) => {
+    e.stopPropagation();
+    try {
+      await adminService.markNotificationAsRead(id);
+      fetchNotifications();
+    } catch (error) {
+      toast.error("Failed to mark as read");
+    }
+  };
+
+  const handleDeleteNotification = async (id, e) => {
+    e.stopPropagation();
+    try {
+      await adminService.deleteNotification(id);
+      toast.success("Notification deleted");
+      fetchNotifications();
+    } catch (error) {
+      toast.error("Failed to delete notification");
+    }
+  };
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const handleGlobalSearch = (e) => {
     e.preventDefault();
@@ -237,96 +279,85 @@ export const AdminDashboardLayout = ({ children }) => {
 
 
             {/* Notification system */}
-            <div style={{ position: "relative", cursor: "pointer" }}>
-              <Bell size={18} style={{ color: darkMode ? "#94a3b8" : "#64748b" }} />
-              <span style={{
-                position: "absolute",
-                top: "-4px",
-                right: "-2px",
-                background: "#3b82f6",
-                width: "6px",
-                height: "6px",
-                borderRadius: "50%"
-              }}></span>
-            </div>
-
-            {/* Profile Avatar popup drawer */}
             <div style={{ position: "relative" }}>
               <div 
-                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                style={{ display: "flex", alignItems: "center", gap: "10px", cursor: "pointer" }}
+                style={{ cursor: "pointer", position: "relative", padding: "8px", borderRadius: "50%", background: "rgba(255,255,255,0.05)" }}
+                onClick={() => setNotificationDropdownOpen(!notificationDropdownOpen)}
               >
-                <img
-                  src={admin?.profileImage || "https://i.pravatar.cc/150?img=60"}
-                  alt="admin avatar"
-                  style={{
-                    width: "35px",
-                    height: "35px",
-                    borderRadius: "50%",
-                    border: "2px solid #3b82f6"
-                  }}
-                />
-                {sidebarOpen && (
-                  <div style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-                    <span style={{ fontSize: "13px", fontWeight: "600" }}>{admin?.name || "Admin"}</span>
-                    <ChevronDown size={14} style={{ color: "#94a3b8" }} />
-                  </div>
+                <Bell size={20} style={{ color: darkMode ? "#94a3b8" : "#64748b" }} />
+                {unreadCount > 0 && (
+                  <span style={{
+                    position: "absolute",
+                    top: "0px",
+                    right: "0px",
+                    background: "#ef4444",
+                    color: "white",
+                    fontSize: "10px",
+                    fontWeight: "bold",
+                    width: "16px",
+                    height: "16px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    borderRadius: "50%"
+                  }}>{unreadCount}</span>
                 )}
               </div>
 
-              {profileDropdownOpen && (
+              {notificationDropdownOpen && (
                 <div style={{
                   position: "absolute",
                   top: "45px",
                   right: "0",
-                  width: "180px",
+                  width: "320px",
+                  maxHeight: "400px",
+                  overflowY: "auto",
                   backgroundColor: darkMode ? "#1e293b" : "white",
                   border: darkMode ? "1px solid rgba(255, 255, 255, 0.05)" : "1px solid #e2e8f0",
-                  borderRadius: "8px",
-                  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-                  padding: "6px 0",
+                  borderRadius: "12px",
+                  boxShadow: "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                  padding: "0",
                   zIndex: 100
                 }}>
-                  <Link 
-                    to="/admin/settings" 
-                    onClick={() => setProfileDropdownOpen(false)}
-                    style={{
-                      display: "block",
-                      padding: "10px 16px",
-                      fontSize: "13px",
-                      color: darkMode ? "#cbd5e1" : "#475569",
-                      textDecoration: "none",
-                      transition: "background 0.2s"
-                    }}
-                    onMouseOver={(e) => e.target.style.backgroundColor = darkMode ? "rgba(255, 255, 255, 0.05)" : "#f1f5f9"}
-                    onMouseOut={(e) => e.target.style.backgroundColor = "transparent"}
-                  >
-                    ⚙ Settings
-                  </Link>
-                  <div style={{ height: "1px", background: darkMode ? "rgba(255, 255, 255, 0.05)" : "#e2e8f0", margin: "4px 0" }}></div>
-                  <button
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      logout();
-                    }}
-                    style={{
-                      width: "100%",
-                      textAlign: "left",
-                      display: "block",
-                      padding: "10px 16px",
-                      fontSize: "13px",
-                      color: "#ef4444",
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      fontWeight: "600",
-                      transition: "background 0.2s"
-                    }}
-                    onMouseOver={(e) => e.target.style.backgroundColor = "rgba(239, 68, 68, 0.05)"}
-                    onMouseOut={(e) => e.target.style.backgroundColor = "transparent"}
-                  >
-                    🚪 Logout
-                  </button>
+                  <div style={{ padding: "12px 16px", borderBottom: darkMode ? "1px solid rgba(255,255,255,0.05)" : "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <h4 style={{ margin: 0, fontSize: "14px", fontWeight: "600" }}>Notifications</h4>
+                    {unreadCount > 0 && <span style={{ fontSize: "11px", background: "#3b82f6", color: "white", padding: "2px 8px", borderRadius: "10px" }}>{unreadCount} New</span>}
+                  </div>
+                  
+                  {notifications.length === 0 ? (
+                    <div style={{ padding: "30px", textAlign: "center", color: "#94a3b8", fontSize: "13px" }}>
+                      No notifications available.
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      {notifications.map((notif) => (
+                        <div key={notif._id} style={{
+                          padding: "12px 16px",
+                          borderBottom: darkMode ? "1px solid rgba(255,255,255,0.02)" : "1px solid #f1f5f9",
+                          background: notif.isRead ? "transparent" : (darkMode ? "rgba(59, 130, 246, 0.05)" : "rgba(59, 130, 246, 0.05)"),
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "10px",
+                          transition: "background 0.2s"
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ margin: "0 0 4px 0", fontSize: "13px", color: darkMode ? "#f8fafc" : "#1e293b", fontWeight: notif.isRead ? "400" : "600" }}>{notif.message}</p>
+                            <span style={{ fontSize: "11px", color: "#94a3b8" }}>{new Date(notif.createdAt).toLocaleString()}</span>
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", gap: "5px" }}>
+                            {!notif.isRead && (
+                              <button onClick={(e) => handleMarkAsRead(notif._id, e)} title="Mark as read" style={{ background: "none", border: "none", cursor: "pointer", color: "#3b82f6", padding: "2px" }}>
+                                <Check size={14} />
+                              </button>
+                            )}
+                            <button onClick={(e) => handleDeleteNotification(notif._id, e)} title="Delete" style={{ background: "none", border: "none", cursor: "pointer", color: "#ef4444", padding: "2px" }}>
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

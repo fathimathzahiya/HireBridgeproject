@@ -44,7 +44,7 @@ export const adminService = {
     adminClient.get("/students").then((res) => res.data),
 
   addStudent: (data) =>
-    adminClient.post("/students/add", data).then((res) => res.data),
+    adminClient.post("/students/add", data, { headers: { "Content-Type": "multipart/form-data" } }).then((res) => res.data),
 
   getStudent: (id) =>
     adminClient.get(`/students/${id}`).then((res) => res.data),
@@ -63,7 +63,7 @@ export const adminService = {
     adminClient.get("/companies").then((res) => res.data),
 
   addCompany: (data) =>
-    adminClient.post("/companies/add", data).then((res) => res.data),
+    adminClient.post("/companies/add", data, { headers: { "Content-Type": "multipart/form-data" } }).then((res) => res.data),
 
   approveCompany: (id) =>
     adminClient.patch(`/companies/approve/${id}`).then((res) => res.data),
@@ -107,6 +107,9 @@ export const adminService = {
 
   deleteNotification: (id) =>
     adminClient.delete(`/notifications/${id}`).then((res) => res.data),
+    
+  markNotificationAsRead: (id) =>
+    adminClient.patch(`/notifications/read/${id}`).then((res) => res.data),
 };
 
 export default adminService;

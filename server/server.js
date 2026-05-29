@@ -44,7 +44,6 @@ const seedAdmin = async () => {
         name: "Placement Admin",
         email: "admin@hirebridge.com",
         password: hashedPassword,
-        profileImage: "https://i.pravatar.cc/150?img=60",
         role: "admin",
       });
       console.log("Admin account successfully seeded: admin@hirebridge.com / adminpassword123");

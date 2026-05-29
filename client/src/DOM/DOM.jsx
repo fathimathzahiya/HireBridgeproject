@@ -25,7 +25,6 @@ import { AddCompany } from '../pages/admin/AddCompany'
 import { JobManagement } from '../pages/admin/JobManagement'
 import { ApplicationManagement } from '../pages/admin/ApplicationManagement'
 import { AdminInterviewManagement } from '../pages/admin/AdminInterviewManagement'
-import { NotificationManagement } from '../pages/admin/NotificationManagement'
 import { AdminSettings } from '../pages/admin/AdminSettings'
 
 // Route Protection Contexts & Components
@@ -89,7 +88,6 @@ function DOM() {
                       <Route path="jobs" element={<JobManagement />} />
                       <Route path="applications" element={<ApplicationManagement />} />
                       <Route path="interviews" element={<AdminInterviewManagement />} />
-                      <Route path="notifications" element={<NotificationManagement />} />
                       <Route path="settings" element={<AdminSettings />} />
                     </Routes>
                   </AdminDashboardLayout>

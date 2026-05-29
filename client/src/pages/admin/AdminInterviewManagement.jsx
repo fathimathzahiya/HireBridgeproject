@@ -34,16 +34,6 @@ export const AdminInterviewManagement = () => {
     }
   };
 
-  const handleManualComplete = async (id) => {
-    try {
-      await adminService.completeInterview(id);
-      toast.success("Interview marked as Completed successfully.");
-      fetchInterviews();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to complete interview.");
-    }
-  };
 
   // Filter interviews
   const filteredInterviews = interviews.filter((item) => {
@@ -158,7 +148,6 @@ export const AdminInterviewManagement = () => {
                 <th style={{ padding: "16px 20px" }}>Interview Date & Time</th>
                 <th style={{ padding: "16px 20px" }}>Meeting Status</th>
                 <th style={{ padding: "16px 20px" }}>Evaluation Result</th>
-                <th style={{ padding: "16px 20px" }}>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -214,28 +203,6 @@ export const AdminInterviewManagement = () => {
                           ? "#ef4444"
                           : "#cbd5e1"
                     }}>{item.result}</span>
-                  </td>
-                  <td style={{ padding: "16px 20px" }}>
-                    {item.status === "Scheduled" && (
-                      <button
-                        onClick={() => handleManualComplete(item._id)}
-                        style={{
-                          border: "none",
-                          background: "rgba(16,185,129,0.1)",
-                          color: "#10b981",
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          cursor: "pointer",
-                          fontSize: "11px",
-                          fontWeight: "700",
-                          display: "flex",
-                          alignItems: "center",
-                          gap: "4px"
-                        }}
-                      >
-                        <Check size={12} /> Mark Completed
-                      </button>
-                    )}
                   </td>
                 </tr>
               ))}

@@ -41,7 +41,6 @@ const loginAdmin = async (req, res) => {
         id: admin._id,
         name: admin.name,
         email: admin.email,
-        profileImage: admin.profileImage,
         role: admin.role,
         lastLogin: admin.lastLogin,
       },
@@ -94,7 +93,6 @@ const updateAdminSettings = async (req, res) => {
         id: admin._id,
         name: admin.name,
         email: admin.email,
-        profileImage: admin.profileImage,
         role: admin.role,
         lastLogin: admin.lastLogin,
       },
@@ -148,7 +146,7 @@ const updateStudent = async (req, res) => {
 // Add a student manually
 const addStudent = async (req, res) => {
   try {
-    const { username, email, password, phone, address, department, cgpa, skills, linkedin, github, projects, certifications } = req.body;
+    const { username, email, password, phoneNumber, address, department, cgpa, skills, linkedin, github, project } = req.body;
     
     // Check if email already exists
     const existing = await Student.findOne({ email });
@@ -159,19 +157,31 @@ const addStudent = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
+    let profileImage = "";
+    let resume = "";
+    let certification = "";
+
+    if (req.files) {
+      if (req.files.profileImage) profileImage = `/uploads/student/${req.files.profileImage[0].filename}`;
+      if (req.files.resume) resume = `/uploads/resume/${req.files.resume[0].filename}`;
+      if (req.files.certification) certification = `/uploads/${req.files.certification[0].filename}`;
+    }
+
     const newStudent = await Student.create({
       username,
       email,
       password: hashedPassword,
-      phoneNumber: phone,
+      phoneNumber,
       address,
       department,
-      cgpa: Number(cgpa),
+      cgpa: Number(cgpa) || 0,
       skills,
       linkedin,
       github,
-      project: projects,
-      certification: certifications,
+      project,
+      profileImage,
+      resume,
+      certification,
       confirmPassword: password,
     });
 
@@ -268,30 +278,34 @@ const deleteCompany = async (req, res) => {
 // Add a company manually
 const addCompany = async (req, res) => {
   try {
-    const { companyName, hrName, hrEmail, password, about, logo } = req.body;
+    const { name, email, website, HRName, phoneNumber, location, description, password } = req.body;
 
-    const existing = await Company.findOne({ email: hrEmail });
+    const existing = await Company.findOne({ email: email });
     if (existing) {
-      return res.status(400).json({ error: "HR Email is already registered." });
+      return res.status(400).json({ error: "Email is already registered." });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    const logoUrl = logo || "https://i.pravatar.cc/150";
+    let profilePhotoUrl = "https://i.pravatar.cc/150";
+    if (req.file) {
+      profilePhotoUrl = `/uploads/company/${req.file.filename}`;
+    }
 
     const newCompany = await Company.create({
-      name: companyName,
-      email: hrEmail,
-      HRName: hrName,
-      HREmail: hrEmail,
+      name,
+      email,
+      website,
+      HRName,
+      HREmail: email,
+      phoneNumber,
+      location,
+      aboutCompany: description,
       password: hashedPassword,
       confirmPassword: password,
-      aboutCompany: about,
-      companyLogo: logoUrl,
-      profilePhoto: logoUrl,
-      website: "http://not-specified.com",
-      phoneNumber: "0000000000",
+      companyLogo: profilePhotoUrl,
+      profilePhoto: profilePhotoUrl,
       isApproved: true,
     });
 
@@ -443,6 +457,21 @@ const deleteNotification = async (req, res) => {
   }
 };
 
+// Mark notification as read
+const markNotificationAsRead = async (req, res) => {
+  try {
+    const notification = await Notification.findByIdAndUpdate(
+      req.params.id,
+      { isRead: true },
+      { new: true }
+    );
+    res.json(notification);
+  } catch (error) {
+    console.error("Mark notification read error:", error);
+    res.status(500).json({ error: "Unable to mark notification as read." });
+  }
+};
+
 // ===== REPORTS & PLATFORM STATS ANALYTICS =====
 
 // Fetch statistics
@@ -453,104 +482,8 @@ const getAnalyticsStats = async (req, res) => {
     const totalJobs = await Job.countDocuments();
     const totalApplications = await Application.countDocuments();
     const totalInterviews = await Interview.countDocuments();
-
-    // Selected / Rejected Counts
-    const selectedCount = await Application.countDocuments({ status: "Selected" });
-    const rejectedCount = await Application.countDocuments({ status: "Rejected" });
-    const activeRecruiters = await Company.countDocuments({ isBlocked: false, isApproved: true });
-
-    // Success Ratio: Selected / Total Applications
-    const successRatio = totalApplications > 0 ? ((selectedCount / totalApplications) * 100).toFixed(1) : "0.0";
-
-    // 1. Department Placement Trends
-    // Gather all students and group by department, and see how many are selected
-    const students = await Student.find();
-    const deptStats = {};
-    students.forEach((student) => {
-      const dept = student.department || "Unknown";
-      if (!deptStats[dept]) {
-        deptStats[dept] = { total: 0, placed: 0 };
-      }
-      deptStats[dept].total += 1;
-    });
-
-    // Cross-check placed status by finding selected applications
-    const selectedApps = await Application.find({ status: "Selected" }).populate("studentId");
-    selectedApps.forEach((app) => {
-      if (app.studentId && app.studentId.department) {
-        const dept = app.studentId.department;
-        if (deptStats[dept]) {
-          deptStats[dept].placed += 1;
-        }
-      }
-    });
-
-    const departmentPlacements = Object.keys(deptStats).map((dept) => ({
-      department: dept,
-      total: deptStats[dept].total,
-      placed: deptStats[dept].placed,
-      percentage: deptStats[dept].total > 0 ? Math.round((deptStats[dept].placed / deptStats[dept].total) * 100) : 0,
-    }));
-
-    // 2. Monthly Placement Trends (Mock timeline for smooth SVG visualizer)
-    const monthlyTrends = [
-      { month: "Jan", applications: 12, placements: 2 },
-      { month: "Feb", applications: 25, placements: 4 },
-      { month: "Mar", applications: 45, placements: 9 },
-      { month: "Apr", applications: 80, placements: 18 },
-      { month: "May", applications: totalApplications || 120, placements: selectedCount || 26 },
-    ];
-
-    // 3. Corporate Hiring Shares (Group applications by top recruiters)
-    const companySharesRaw = await Application.find().populate("companyId", "name");
-    const companySharesMap = {};
-    companySharesRaw.forEach((app) => {
-      const name = app.companyId?.name || "Other";
-      companySharesMap[name] = (companySharesMap[name] || 0) + 1;
-    });
-
-    const companyHiringStats = Object.keys(companySharesMap)
-      .map((name) => ({
-        company: name,
-        applications: companySharesMap[name],
-      }))
-      .sort((a, b) => b.applications - a.applications)
-      .slice(0, 5); // Take top 5 recruiters
-
-    // 4. Activity Logs
-    const recentActivity = [];
-    const latestStudents = await Student.find().sort({ createdAt: -1 }).limit(3);
-    latestStudents.forEach((s) => {
-      recentActivity.push({
-        id: s._id,
-        type: "student",
-        text: `New student ${s.username} registered in ${s.department || "General"}`,
-        time: s.createdAt,
-      });
-    });
-
-    const latestCompanies = await Company.find().sort({ createdAt: -1 }).limit(3);
-    latestCompanies.forEach((c) => {
-      recentActivity.push({
-        id: c._id,
-        type: "company",
-        text: `New recruiter company ${c.name} registered`,
-        time: c.createdAt,
-      });
-    });
-
-    const latestJobs = await Job.find().sort({ createdAt: -1 }).limit(3);
-    latestJobs.forEach((j) => {
-      recentActivity.push({
-        id: j._id,
-        type: "job",
-        text: `Job role ${j.title} was posted`,
-        time: j.createdAt,
-      });
-    });
-
-    // Sort combined activities by date
-    recentActivity.sort((a, b) => b.time - a.time);
+    const selectedStudents = await Application.countDocuments({ status: "Selected" });
+    const rejectedApplications = await Application.countDocuments({ status: "Rejected" });
 
     res.json({
       stats: {
@@ -559,17 +492,9 @@ const getAnalyticsStats = async (req, res) => {
         totalJobs,
         totalApplications,
         totalInterviews,
-        selectedStudents: selectedCount,
-        rejectedApplications: rejectedCount,
-        activeRecruiters,
-        successRatio,
-      },
-      charts: {
-        departmentPlacements,
-        monthlyTrends,
-        companyHiringStats,
-      },
-      recentActivity: recentActivity.slice(0, 8),
+        selectedStudents,
+        rejectedApplications,
+      }
     });
   } catch (error) {
     console.error("Analytics fetch error:", error);
@@ -602,5 +527,6 @@ module.exports = {
   completeInterview,
   getAllNotifications,
   deleteNotification,
+  markNotificationAsRead,
   getAnalyticsStats,
 };
