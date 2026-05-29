@@ -1,6 +1,7 @@
 const Application = require("../models/applicationmodel");
 const Job = require("../models/jobmodel");
 const Student = require("../models/studentmodel");
+const CompanyNotification = require("../models/companynotificationmodel");
 
 // ===== STUDENT APPLICATION OPERATIONS =====
 
@@ -47,6 +48,18 @@ const applyForJob = async (req, res) => {
       resume,
       status: "Applied",
     });
+
+    // Create real-time Company Notification
+    try {
+      await CompanyNotification.create({
+        companyId,
+        studentId,
+        jobId,
+        message: `New application received for ${job.title} role.`,
+      });
+    } catch (notifErr) {
+      console.error("Failed to create company notification:", notifErr);
+    }
 
     res.json(application);
   } catch (error) {
@@ -184,7 +197,6 @@ const updateApplicationStatus = async (req, res) => {
           jobId: application.jobId._id || application.jobId,
           date: interviewDate,
           time: interviewTime,
-          googleMeetLink: interviewLink,
           status: "Scheduled",
         },
         { upsert: true, new: true }

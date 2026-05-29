@@ -43,6 +43,9 @@ export const adminService = {
   getStudents: () =>
     adminClient.get("/students").then((res) => res.data),
 
+  addStudent: (data) =>
+    adminClient.post("/students/add", data).then((res) => res.data),
+
   getStudent: (id) =>
     adminClient.get(`/students/${id}`).then((res) => res.data),
 
@@ -58,6 +61,9 @@ export const adminService = {
   // Company Management
   getCompanies: () =>
     adminClient.get("/companies").then((res) => res.data),
+
+  addCompany: (data) =>
+    adminClient.post("/companies/add", data).then((res) => res.data),
 
   approveCompany: (id) =>
     adminClient.patch(`/companies/approve/${id}`).then((res) => res.data),
@@ -95,9 +101,9 @@ export const adminService = {
   completeInterview: (id) =>
     adminClient.patch(`/interviews/complete/${id}`).then((res) => res.data),
 
-  // Bulletins & Announcements
-  sendAnnouncement: (title, message, type) =>
-    adminClient.post("/notifications/send", { title, message, type }).then((res) => res.data),
+  // Bulletins & Notifications
+  getAllNotifications: () =>
+    adminClient.get("/notifications").then((res) => res.data),
 
   deleteNotification: (id) =>
     adminClient.delete(`/notifications/${id}`).then((res) => res.data),

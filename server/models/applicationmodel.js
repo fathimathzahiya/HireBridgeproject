@@ -31,10 +31,6 @@ const applicationSchema = new Schema(
       default: Date.now,
     },
 
-    interviewLink: {
-      type: String,
-      required: false,
-    },
 
     interviewDate: {
       type: String,

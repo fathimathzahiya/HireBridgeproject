@@ -17,12 +17,11 @@ const CompanyProfile = () => {
     email: "",
     website: "",
     location: "",
-    industry: "",
-    companySize: "",
     HRName: "",
     HREmail: "",
     phoneNumber: "",
     companyLogo: "",
+    profilePhoto: "",
     aboutCompany: "",
   });
 
@@ -79,12 +78,54 @@ const CompanyProfile = () => {
     }
   };
 
+  const handleProfilePhotoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith("image/")) {
+      toast.warning("Please upload an image file only.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.warning("File size must be less than 5MB.");
+      return;
+    }
+
+    try {
+      const data = new FormData();
+      data.append("profilePhoto", file);
+      
+      const token = localStorage.getItem("hirebridge_token");
+      const res = await fetch("http://localhost:5000/api/company/update-profile-photo", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: data
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to update profile photo");
+      }
+
+      const responseData = await res.json();
+      toast.success("Profile photo updated successfully!");
+      
+      setCompany(responseData.company);
+      setFormData(responseData.company);
+      setLogoPreview(responseData.profilePhoto.startsWith("http") ? responseData.profilePhoto : `http://localhost:5000${responseData.profilePhoto}`);
+    } catch (err) {
+      console.error(err);
+      toast.error("Error updating profile photo: " + err.message);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const data = new FormData();
       Object.keys(formData).forEach((key) => {
-        if (key !== "companyLogo") {
+        if (key !== "companyLogo" && key !== "profilePhoto") {
           data.append(key, formData[key]);
         } else if (!logoFile && formData[key]) {
           data.append(key, formData[key]);
@@ -171,18 +212,48 @@ const CompanyProfile = () => {
                 )}
               </label>
             ) : (
-              <div className="logo-view-container">
-                {company.companyLogo ? (
-                  <img
-                    src={company.companyLogo.startsWith("http") ? company.companyLogo : `http://localhost:5000${company.companyLogo}`}
-                    alt={company.name}
-                    className="floating-logo"
+              <div className="logo-view-container" style={{ position: "relative" }}>
+                <label className="logo-edit-zone" title="Click to upload new photo" style={{ cursor: "pointer" }}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePhotoChange}
+                    style={{ display: "none" }}
                   />
-                ) : (
-                  <div className="logo-placeholder-container">
-                    <span>🏢</span>
+                  {company.profilePhoto || company.companyLogo ? (
+                    <img
+                      src={(company.profilePhoto || company.companyLogo).startsWith("http") ? (company.profilePhoto || company.companyLogo) : `http://localhost:5000${company.profilePhoto || company.companyLogo}`}
+                      alt={company.name}
+                      className="floating-logo"
+                    />
+                  ) : (
+                    <div className="logo-placeholder-container">
+                      <span>🏢</span>
+                    </div>
+                  )}
+                  <div className="logo-upload-overlay" style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    backgroundColor: "rgba(0,0,0,0.5)",
+                    borderRadius: "50%",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    color: "white",
+                    opacity: 0,
+                    transition: "opacity 0.2s"
+                  }}
+                  onMouseOver={(e) => e.currentTarget.style.opacity = 1}
+                  onMouseOut={(e) => e.currentTarget.style.opacity = 0}
+                  >
+                    <span>📸</span>
+                    <p style={{ margin: "2px 0 0 0", fontSize: "10px", fontWeight: "600" }}>Upload Photo</p>
                   </div>
-                )}
+                </label>
               </div>
             )}
           </div>
@@ -194,16 +265,6 @@ const CompanyProfile = () => {
                 <span className="meta-tag location">
                   📍 {isEditing ? (formData.location || "Location not set") : company.location}
                 </span>
-                {(isEditing ? formData.industry : company.industry) && (
-                  <span className="meta-tag industry">
-                    💼 {isEditing ? formData.industry : company.industry}
-                  </span>
-                )}
-                {(isEditing ? formData.companySize : company.companySize) && (
-                  <span className="meta-tag size">
-                    👥 {isEditing ? formData.companySize : company.companySize} Employees
-                  </span>
-                )}
               </div>
             </div>
 
@@ -279,7 +340,7 @@ const CompanyProfile = () => {
                   </div>
 
                   <div className="form-row-3col">
-                    <div className="form-group">
+                    <div className="form-group" style={{ gridColumn: "span 3" }}>
                       <label>Location *</label>
                       <div className="input-with-icon">
                         <span className="input-icon">📍</span>
@@ -291,39 +352,6 @@ const CompanyProfile = () => {
                           required
                           placeholder="e.g. New York, USA"
                         />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Industry</label>
-                      <div className="input-with-icon">
-                        <span className="input-icon">🏭</span>
-                        <input
-                          type="text"
-                          name="industry"
-                          value={formData.industry}
-                          onChange={handleInputChange}
-                          placeholder="e.g. Technology, Finance"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Company Size</label>
-                      <div className="input-with-icon">
-                        <span className="input-icon">👥</span>
-                        <select
-                          name="companySize"
-                          value={formData.companySize}
-                          onChange={handleInputChange}
-                        >
-                          <option value="">Select size</option>
-                          <option value="Startup">Startup (1-10)</option>
-                          <option value="Small">Small (11-50)</option>
-                          <option value="Medium">Medium (51-200)</option>
-                          <option value="Large">Large (201-500)</option>
-                          <option value="Enterprise">Enterprise (500+)</option>
-                        </select>
                       </div>
                     </div>
                   </div>
@@ -474,24 +502,9 @@ const CompanyProfile = () => {
                     </div>
                   </div>
 
-                  <div className="detail-pill">
-                    <span className="pill-icon">🏭</span>
-                    <div className="pill-meta">
-                      <span className="pill-label">Industry</span>
-                      <span className="pill-value">{company.industry || "Not Specified"}</span>
-                    </div>
-                  </div>
-
-                  <div className="detail-pill">
-                    <span className="pill-icon">👥</span>
-                    <div className="pill-meta">
-                      <span className="pill-label">Company Size</span>
-                      <span className="pill-value">{company.companySize || "Not Specified"}</span>
-                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
             <div className="profile-sidebar-column">
               {/* HR / Contact Sidebar Card */}

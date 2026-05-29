@@ -120,20 +120,6 @@ function UpcomingInterviews() {
                     </div>
                   </div>
 
-                  {interview.googleMeetLink && (
-                    <div className="meet-link">
-                      <strong>Google Meet / Platform Link:</strong>
-                      <p>
-                        <a 
-                          href={interview.googleMeetLink.startsWith("http") ? interview.googleMeetLink : `https://${interview.googleMeetLink}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          {interview.googleMeetLink}
-                        </a>
-                      </p>
-                    </div>
-                  )}
 
                   {interview.instructions && (
                     <div className="interview-instructions">
@@ -143,17 +129,7 @@ function UpcomingInterviews() {
                   )}
 
                   <div className="interview-actions">
-                    {interview.googleMeetLink && (
-                      <a 
-                        href={interview.googleMeetLink.startsWith("http") ? interview.googleMeetLink : `https://${interview.googleMeetLink}`}
-                        target="_blank"
-                        rel="noopener noreferrer" 
-                        className="btn-primary"
-                        title="Join Interview"
-                      >
-                        Join Interview
-                      </a>
-                    )}
+
                     <button className="btn-secondary" style={{ cursor: "not-allowed", opacity: 0.6 }} disabled>
                       Reschedule Locked
                     </button>

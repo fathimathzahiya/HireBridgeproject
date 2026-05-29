@@ -156,7 +156,6 @@ export const AdminInterviewManagement = () => {
                 <th style={{ padding: "16px 20px" }}>Job Role Title</th>
                 <th style={{ padding: "16px 20px" }}>Company Recruiter</th>
                 <th style={{ padding: "16px 20px" }}>Interview Date & Time</th>
-                <th style={{ padding: "16px 20px" }}>Meeting Link</th>
                 <th style={{ padding: "16px 20px" }}>Meeting Status</th>
                 <th style={{ padding: "16px 20px" }}>Evaluation Result</th>
                 <th style={{ padding: "16px 20px" }}>Actions</th>
@@ -173,18 +172,6 @@ export const AdminInterviewManagement = () => {
                       <Calendar size={13} style={{ color: "#64748b" }} />
                       <span>{new Date(item.date).toLocaleDateString()} at {item.time}</span>
                     </div>
-                  </td>
-                  <td style={{ padding: "16px 20px" }}>
-                    {item.googleMeetLink ? (
-                      <a
-                        href={item.googleMeetLink.startsWith("http") ? item.googleMeetLink : `https://${item.googleMeetLink}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ display: "flex", alignItems: "center", gap: "6px", color: "#3b82f6", textDecoration: "none" }}
-                      >
-                        <Video size={14} /> Join Meeting
-                      </a>
-                    ) : "N/A"}
                   </td>
                   <td style={{ padding: "16px 20px" }}>
                     <span style={{

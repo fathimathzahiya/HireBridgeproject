@@ -145,6 +145,43 @@ const updateStudent = async (req, res) => {
   }
 };
 
+// Add a student manually
+const addStudent = async (req, res) => {
+  try {
+    const { username, email, password, phone, address, department, cgpa, skills, linkedin, github, projects, certifications } = req.body;
+    
+    // Check if email already exists
+    const existing = await Student.findOne({ email });
+    if (existing) {
+      return res.status(400).json({ error: "Student email is already registered." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newStudent = await Student.create({
+      username,
+      email,
+      password: hashedPassword,
+      phoneNumber: phone,
+      address,
+      department,
+      cgpa: Number(cgpa),
+      skills,
+      linkedin,
+      github,
+      project: projects,
+      certification: certifications,
+      confirmPassword: password,
+    });
+
+    res.status(201).json({ message: "Student account successfully created.", student: newStudent });
+  } catch (error) {
+    console.error("Add student error:", error);
+    res.status(500).json({ error: "Unable to manually create student profile." });
+  }
+};
+
 // Block/Unblock student
 const blockStudent = async (req, res) => {
   try {
@@ -228,12 +265,49 @@ const deleteCompany = async (req, res) => {
   }
 };
 
+// Add a company manually
+const addCompany = async (req, res) => {
+  try {
+    const { companyName, hrName, hrEmail, password, about, logo } = req.body;
+
+    const existing = await Company.findOne({ email: hrEmail });
+    if (existing) {
+      return res.status(400).json({ error: "HR Email is already registered." });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const logoUrl = logo || "https://i.pravatar.cc/150";
+
+    const newCompany = await Company.create({
+      name: companyName,
+      email: hrEmail,
+      HRName: hrName,
+      HREmail: hrEmail,
+      password: hashedPassword,
+      confirmPassword: password,
+      aboutCompany: about,
+      companyLogo: logoUrl,
+      profilePhoto: logoUrl,
+      website: "http://not-specified.com",
+      phoneNumber: "0000000000",
+      isApproved: true,
+    });
+
+    res.status(201).json({ message: "Company account successfully created.", company: newCompany });
+  } catch (error) {
+    console.error("Add company error:", error);
+    res.status(500).json({ error: "Unable to manually create recruiter company." });
+  }
+};
+
 // ===== JOB MANAGEMENT =====
 
 // Get all jobs
 const getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find().populate("companyId", "name location industry");
+    const jobs = await Job.find().populate("companyId", "name location");
     res.json(jobs);
   } catch (error) {
     console.error(error);
@@ -343,29 +417,18 @@ const completeInterview = async (req, res) => {
 
 // ===== SYSTEM BULLETIN NOTIFICATIONS =====
 
-// Send global announcements
-const sendAnnouncement = async (req, res) => {
+// Get all platform notifications for Admin log
+const getAllNotifications = async (req, res) => {
   try {
-    const { title, message, type } = req.body;
-
-    const students = await Student.find({ isBlocked: false });
-    const notificationPromises = students.map((student) => {
-      // Find one application for references to prevent crash on null
-      return Notification.create({
-        studentId: student._id,
-        applicationId: "000000000000000000000000", // Placeholder ID for global announcement
-        companyId: "000000000000000000000000",
-        jobId: "000000000000000000000000",
-        message: `[${type.toUpperCase()}] ${title}: ${message}`,
-        type: "Other",
-      });
-    });
-
-    await Promise.all(notificationPromises);
-    res.json({ message: `Announcement successfully dispatched to ${students.length} students.` });
+    const notifications = await Notification.find()
+      .populate("studentId", "username email department")
+      .populate("companyId", "name")
+      .populate("jobId", "title")
+      .sort({ createdAt: -1 });
+    res.json(notifications);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Unable to dispatch announcements." });
+    console.error("Get all notifications error:", error);
+    res.status(500).json({ error: "Unable to retrieve platform notifications." });
   }
 };
 
@@ -519,11 +582,13 @@ module.exports = {
   getAdminProfile,
   updateAdminSettings,
   getAllStudents,
+  addStudent,
   getStudentById,
   updateStudent,
   blockStudent,
   deleteStudent,
   getAllCompanies,
+  addCompany,
   approveCompany,
   blockCompany,
   deleteCompany,
@@ -535,7 +600,7 @@ module.exports = {
   deleteApplication,
   getAllInterviews,
   completeInterview,
-  sendAnnouncement,
+  getAllNotifications,
   deleteNotification,
   getAnalyticsStats,
 };

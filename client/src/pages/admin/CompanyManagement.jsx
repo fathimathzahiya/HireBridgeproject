@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { adminService } from "../../services/adminService";
 import { toast } from "react-toastify";
 import { CompanyDetails } from "./CompanyDetails";
@@ -10,10 +11,12 @@ import {
   Unlock,
   Trash2,
   Eye,
-  Building2
+  Building2,
+  PlusCircle
 } from "lucide-react";
 
 export const CompanyManagement = () => {
+  const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCompany, setSelectedCompany] = useState(null);
@@ -118,8 +121,35 @@ export const CompanyManagement = () => {
           <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "700" }}>Company Management</h2>
           <p style={{ margin: "5px 0 0 0", color: "#64748b", fontSize: "14px" }}>Approve new recruiters, verify profiles, and manage active jobs.</p>
         </div>
-        <div style={{ fontSize: "14px", fontWeight: "600", color: "#10b981", background: "rgba(16,185,129,0.1)", padding: "8px 16px", borderRadius: "8px" }}>
-          Total: {filteredCompanies.length} Recruiters
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <button
+            onClick={() => navigate("/admin/companies/add")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "10px 18px",
+              borderRadius: "8px",
+              border: "none",
+              background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+              color: "white",
+              fontWeight: "600",
+              fontSize: "13px",
+              cursor: "pointer",
+              boxShadow: "0 4px 15px rgba(16,185,129,0.3)",
+              transition: "transform 0.1s"
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
+          >
+            <PlusCircle size={14} />
+            <span>Add Company</span>
+          </button>
+          
+          <div style={{ fontSize: "14px", fontWeight: "600", color: "#10b981", background: "rgba(16,185,129,0.1)", padding: "8px 16px", borderRadius: "8px" }}>
+            Total: {filteredCompanies.length} Recruiters
+          </div>
         </div>
       </div>
 
@@ -196,7 +226,6 @@ export const CompanyManagement = () => {
                 <th style={{ padding: "16px 20px" }}>Company Logo & Name</th>
                 <th style={{ padding: "16px 20px" }}>HR Manager</th>
                 <th style={{ padding: "16px 20px" }}>HR Email</th>
-                <th style={{ padding: "16px 20px" }}>Industry Sector</th>
                 <th style={{ padding: "16px 20px" }}>Jobs Posted</th>
                 <th style={{ padding: "16px 20px" }}>Vetting status</th>
                 <th style={{ padding: "16px 20px" }}>Actions</th>
@@ -224,7 +253,6 @@ export const CompanyManagement = () => {
                   </td>
                   <td style={{ padding: "16px 20px" }}>{company.HRName}</td>
                   <td style={{ padding: "16px 20px", color: "#cbd5e1" }}>{company.email}</td>
-                  <td style={{ padding: "16px 20px" }}>{company.industry || "General / IT"}</td>
                   <td style={{ padding: "16px 20px", fontWeight: "700", textAlign: "center", color: "#3b82f6" }}>
                     {getJobCount(company._id)}
                   </td>

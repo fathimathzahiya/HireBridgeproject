@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { adminService } from "../../services/adminService";
 import { toast } from "react-toastify";
 import { StudentDetails } from "./StudentDetails";
@@ -11,10 +12,12 @@ import {
   Lock,
   Unlock,
   FileText,
-  Plus
+  Plus,
+  UserPlus
 } from "lucide-react";
 
 export const StudentManagement = () => {
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -165,8 +168,35 @@ export const StudentManagement = () => {
           <h2 style={{ margin: 0, fontSize: "24px", fontWeight: "700" }}>Student Management</h2>
           <p style={{ margin: "5px 0 0 0", color: "#64748b", fontSize: "14px" }}>View, modify, and review registered student profiles.</p>
         </div>
-        <div style={{ fontSize: "14px", fontWeight: "600", color: "#3b82f6", background: "rgba(59,130,246,0.1)", padding: "8px 16px", borderRadius: "8px" }}>
-          Total: {filteredStudents.length} Students
+        
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <button
+            onClick={() => navigate("/admin/students/add")}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "10px 18px",
+              borderRadius: "8px",
+              border: "none",
+              background: "linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)",
+              color: "white",
+              fontWeight: "600",
+              fontSize: "13px",
+              cursor: "pointer",
+              boxShadow: "0 4px 15px rgba(139,92,246,0.3)",
+              transition: "transform 0.1s"
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "translateY(-1px)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "translateY(0)"}
+          >
+            <UserPlus size={14} />
+            <span>Add Student</span>
+          </button>
+          
+          <div style={{ fontSize: "14px", fontWeight: "600", color: "#3b82f6", background: "rgba(59,130,246,0.1)", padding: "8px 16px", borderRadius: "8px" }}>
+            Total: {filteredStudents.length} Students
+          </div>
         </div>
       </div>
 

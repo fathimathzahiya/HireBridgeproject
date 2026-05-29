@@ -14,18 +14,26 @@ import UpcomingInterviews from '../pages/dashboard/UpcomingInterviews'
 import CompanyDashboardRouter from '../pages/companyDashboard/CompanyDashboardRouter'
 
 // Admin Panel Imports
-import { AdminAuthProvider, ProtectedAdminRoute } from '../context/AdminAuthContext'
+import { AdminAuthProvider } from '../context/AdminAuthContext'
 import { AdminDashboardLayout } from '../layouts/AdminDashboardLayout'
 import { AdminLogin } from '../pages/admin/AdminLogin'
 import { AdminOverview } from '../pages/admin/AdminOverview'
 import { StudentManagement } from '../pages/admin/StudentManagement'
+import { AddStudent } from '../pages/admin/AddStudent'
 import { CompanyManagement } from '../pages/admin/CompanyManagement'
+import { AddCompany } from '../pages/admin/AddCompany'
 import { JobManagement } from '../pages/admin/JobManagement'
 import { ApplicationManagement } from '../pages/admin/ApplicationManagement'
 import { AdminInterviewManagement } from '../pages/admin/AdminInterviewManagement'
 import { NotificationManagement } from '../pages/admin/NotificationManagement'
-import { Reports } from '../pages/admin/Reports'
 import { AdminSettings } from '../pages/admin/AdminSettings'
+
+// Route Protection Contexts & Components
+import { StudentAuthProvider } from '../context/AuthContext'
+import { StudentProtectedRoute } from '../components/StudentProtectedRoute'
+import { CompanyAuthProvider } from '../context/CompanyAuthContext'
+import { CompanyProtectedRoute } from '../components/CompanyProtectedRoute'
+import { AdminProtectedRoute } from '../components/AdminProtectedRoute'
 
 function DOM() {
   return (
@@ -41,21 +49,27 @@ function DOM() {
             <Route path='/studentreg' element={<Studentreg/>}/>
             <Route path='/companyreg' element={<Companyreg/>}/>
 
-            {/* Student Dashboard */}
-            <Route path='/student/dashboard' element={<StudentDashboard/>}/>
-            <Route path='/student-dashboard' element={<DashboardOverview/>}/>
-            <Route path='/jobs' element={<Jobs/>}/>
-            <Route path='/student-dashboard/jobs' element={<Jobs/>}/>
-            <Route path='/student-dashboard/applied-jobs' element={<AppliedJobs/>}/>
-            <Route path='/student-dashboard/selected-jobs' element={<SelectedJobs/>}/>
-            <Route path='/student-dashboard/shortlisted-jobs' element={<ShortlistedJobs/>}/>
-            <Route path='/student-dashboard/rejected-jobs' element={<RejectedJobs/>}/>
-            <Route path='/student-dashboard/upcoming-interviews' element={<UpcomingInterviews/>}/>
+            {/* Student Dashboard (Protected) */}
+            <Route path='/student/dashboard' element={<StudentAuthProvider><StudentProtectedRoute><StudentDashboard/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/student-dashboard' element={<StudentAuthProvider><StudentProtectedRoute><DashboardOverview/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/jobs' element={<StudentAuthProvider><StudentProtectedRoute><Jobs/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/student-dashboard/jobs' element={<StudentAuthProvider><StudentProtectedRoute><Jobs/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/student-dashboard/applied-jobs' element={<StudentAuthProvider><StudentProtectedRoute><AppliedJobs/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/student-dashboard/selected-jobs' element={<StudentAuthProvider><StudentProtectedRoute><SelectedJobs/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/student-dashboard/shortlisted-jobs' element={<StudentAuthProvider><StudentProtectedRoute><ShortlistedJobs/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/student-dashboard/rejected-jobs' element={<StudentAuthProvider><StudentProtectedRoute><RejectedJobs/></StudentProtectedRoute></StudentAuthProvider>}/>
+            <Route path='/student-dashboard/upcoming-interviews' element={<StudentAuthProvider><StudentProtectedRoute><UpcomingInterviews/></StudentProtectedRoute></StudentAuthProvider>}/>
 
-            {/* Company Dashboard */}
-            <Route path='/company/:companyId/*' element={<CompanyDashboardRouter/>}/>
+            {/* Company Dashboard (Protected) */}
+            <Route path='/company/:companyId/*' element={
+              <CompanyAuthProvider>
+                <CompanyProtectedRoute>
+                  <CompanyDashboardRouter/>
+                </CompanyProtectedRoute>
+              </CompanyAuthProvider>
+            }/>
 
-            {/* Admin Dashboard */}
+            {/* Admin Dashboard (Protected) */}
             <Route path='/admin/login' element={
               <AdminAuthProvider>
                 <AdminLogin />
@@ -64,21 +78,22 @@ function DOM() {
             
             <Route path='/admin/*' element={
               <AdminAuthProvider>
-                <ProtectedAdminRoute>
+                <AdminProtectedRoute>
                   <AdminDashboardLayout>
                     <Routes>
                       <Route path="overview" element={<AdminOverview />} />
                       <Route path="students" element={<StudentManagement />} />
+                      <Route path="students/add" element={<AddStudent />} />
                       <Route path="companies" element={<CompanyManagement />} />
+                      <Route path="companies/add" element={<AddCompany />} />
                       <Route path="jobs" element={<JobManagement />} />
                       <Route path="applications" element={<ApplicationManagement />} />
                       <Route path="interviews" element={<AdminInterviewManagement />} />
                       <Route path="notifications" element={<NotificationManagement />} />
-                      <Route path="reports" element={<Reports />} />
                       <Route path="settings" element={<AdminSettings />} />
                     </Routes>
                   </AdminDashboardLayout>
-                </ProtectedAdminRoute>
+                </AdminProtectedRoute>
               </AdminAuthProvider>
             } />
           </Routes>

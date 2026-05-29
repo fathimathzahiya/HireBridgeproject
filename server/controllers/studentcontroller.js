@@ -66,7 +66,17 @@ const updatestudent = async(req, res) => {
                 console.log('Resume uploaded:', updateData.resume);
             }
             if (req.files.certification && req.files.certification[0]) {
-                updateData.certification = `/uploads/${req.files.certification[0].filename}`;
+                const certFile = req.files.certification[0];
+                if (certFile.mimetype !== 'application/pdf') {
+                    const fs = require('fs');
+                    try {
+                        fs.unlinkSync(certFile.path);
+                    } catch (e) {
+                        console.error('Failed to unlink invalid cert file:', e);
+                    }
+                    return res.status(400).json({ error: "Certificate must be in PDF format only." });
+                }
+                updateData.certification = `/uploads/${certFile.filename}`;
                 console.log('Certification uploaded:', updateData.certification);
             }
         }

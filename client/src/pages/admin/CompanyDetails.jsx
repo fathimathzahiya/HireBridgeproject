@@ -115,8 +115,8 @@ export const CompanyDetails = ({ company, onClose, jobsCount, jobsData }) => {
           padding: "15px"
         }}>
           <div>
-            <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", textTransform: "uppercase" }}>Industry Sector</span>
-            <p style={{ margin: "3px 0 0 0", fontSize: "14px", fontWeight: "700" }}>{company.industry || "Information Technology"}</p>
+            <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", textTransform: "uppercase" }}>Recruiter Location</span>
+            <p style={{ margin: "3px 0 0 0", fontSize: "14px", fontWeight: "700" }}>{company.location || "Not Specified"}</p>
           </div>
           <div>
             <span style={{ fontSize: "11px", color: "#64748b", fontWeight: "600", textTransform: "uppercase" }}>Active Postings</span>

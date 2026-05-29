@@ -21,7 +21,6 @@ const InterviewManagement = () => {
     applicationId: "",
     date: "",
     time: "",
-    googleMeetLink: "",
     instructions: "",
   });
   const [filterStatus, setFilterStatus] = useState("All");
@@ -73,8 +72,7 @@ const InterviewManagement = () => {
       if (
         !formData.applicationId ||
         !formData.date ||
-        !formData.time ||
-        !formData.googleMeetLink
+        !formData.time
       ) {
         toast.warning("Please fill all required fields");
         return;
@@ -88,7 +86,6 @@ const InterviewManagement = () => {
         jobId: applicant.jobId._id,
         date: formData.date,
         time: formData.time,
-        googleMeetLink: formData.googleMeetLink,
         instructions: formData.instructions,
       });
 
@@ -97,7 +94,6 @@ const InterviewManagement = () => {
         applicationId: "",
         date: "",
         time: "",
-        googleMeetLink: "",
         instructions: "",
       });
       setShowScheduleForm(false);
@@ -216,18 +212,6 @@ const InterviewManagement = () => {
             </div>
 
             <div className="form-group">
-              <label>Google Meet Link *</label>
-              <input
-                type="url"
-                name="googleMeetLink"
-                value={formData.googleMeetLink}
-                onChange={handleInputChange}
-                placeholder="https://meet.google.com/..."
-                required
-              />
-            </div>
-
-            <div className="form-group">
               <label>Interview Instructions</label>
               <textarea
                 name="instructions"
@@ -285,12 +269,6 @@ const InterviewManagement = () => {
                     <p>
                       <strong>Date & Time:</strong>{" "}
                       {formatDateTime(interview.date, interview.time)}
-                    </p>
-                    <p>
-                      <strong>Meet Link:</strong>{" "}
-                      <a href={interview.googleMeetLink} target="_blank" rel="noopener noreferrer">
-                        Join Meeting
-                      </a>
                     </p>
                     {interview.instructions && (
                       <p>

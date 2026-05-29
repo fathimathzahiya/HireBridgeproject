@@ -28,17 +28,6 @@ const companySchema = new Schema(
       required: false,
     },
 
-    industry: {
-      type: String,
-      required: false,
-    },
-
-    companySize: {
-      type: String,
-      required: false,
-      enum: ["Startup", "Small", "Medium", "Large", "Enterprise"],
-    },
-
     HRName: {
       type: String,
       required: true,
@@ -55,6 +44,11 @@ const companySchema = new Schema(
     },
 
     companyLogo: {
+      type: String,
+      default: "https://i.pravatar.cc/150",
+    },
+
+    profilePhoto: {
       type: String,
       default: "https://i.pravatar.cc/150",
     },

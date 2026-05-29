@@ -36,11 +36,6 @@ const interviewSchema = new Schema(
       required: true,
     },
 
-    googleMeetLink: {
-      type: String,
-      required: true,
-    },
-
     status: {
       type: String,
       enum: ["Scheduled", "Completed", "Cancelled"],

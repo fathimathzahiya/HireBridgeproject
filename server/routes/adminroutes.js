@@ -7,11 +7,13 @@ const {
   getAdminProfile,
   updateAdminSettings,
   getAllStudents,
+  addStudent,
   getStudentById,
   updateStudent,
   blockStudent,
   deleteStudent,
   getAllCompanies,
+  addCompany,
   approveCompany,
   blockCompany,
   deleteCompany,
@@ -23,7 +25,7 @@ const {
   deleteApplication,
   getAllInterviews,
   completeInterview,
-  sendAnnouncement,
+  getAllNotifications,
   deleteNotification,
   getAnalyticsStats,
 } = require("../controllers/admincontroller");
@@ -37,6 +39,7 @@ adminrouter.put("/profile/update", protect, adminOnly, updateAdminSettings);
 
 // ===== STUDENT MANAGEMENT =====
 adminrouter.get("/students", protect, adminOnly, getAllStudents);
+adminrouter.post("/students/add", protect, adminOnly, addStudent);
 adminrouter.get("/students/:id", protect, adminOnly, getStudentById);
 adminrouter.put("/students/:id", protect, adminOnly, updateStudent);
 adminrouter.delete("/students/:id", protect, adminOnly, deleteStudent);
@@ -44,6 +47,7 @@ adminrouter.patch("/students/block/:id", protect, adminOnly, blockStudent);
 
 // ===== COMPANY MANAGEMENT =====
 adminrouter.get("/companies", protect, adminOnly, getAllCompanies);
+adminrouter.post("/companies/add", protect, adminOnly, addCompany);
 adminrouter.patch("/companies/approve/:id", protect, adminOnly, approveCompany);
 adminrouter.patch("/companies/block/:id", protect, adminOnly, blockCompany);
 adminrouter.delete("/companies/:id", protect, adminOnly, deleteCompany);
@@ -63,7 +67,7 @@ adminrouter.get("/interviews", protect, adminOnly, getAllInterviews);
 adminrouter.patch("/interviews/complete/:id", protect, adminOnly, completeInterview);
 
 // ===== BULLETINS & NOTIFICATIONS =====
-adminrouter.post("/notifications/send", protect, adminOnly, sendAnnouncement);
+adminrouter.get("/notifications", protect, adminOnly, getAllNotifications);
 adminrouter.delete("/notifications/:id", protect, adminOnly, deleteNotification);
 
 // ===== ANALYTICS =====

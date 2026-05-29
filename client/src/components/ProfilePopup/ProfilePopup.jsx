@@ -19,10 +19,29 @@ function ProfilePopup({ studentData, onClose, onSave }) {
 
   const [resumeFile, setResumeFile] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [certificationFile, setCertificationFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const handleCertificationChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Please upload a PDF file for certification");
+        setCertificationFile(null);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size must be less than 5MB");
+        setCertificationFile(null);
+        return;
+      }
+      setCertificationFile(file);
+      setError("");
+    }
+  };
 
   // Initialize form data when entering edit mode or when studentData changes
   useEffect(() => {
@@ -116,11 +135,13 @@ function ProfilePopup({ studentData, onClose, onSave }) {
 
       const data = new FormData();
       Object.keys(formData).forEach((key) => {
-        if (key !== "profileImage") {
+        if (key !== "profileImage" && key !== "certification") {
           if (formData[key] !== undefined && formData[key] !== null) {
             data.append(key, formData[key]);
           }
-        } else if (!imageFile && formData[key]) {
+        } else if (key === "profileImage" && !imageFile && formData[key]) {
+          data.append(key, formData[key]);
+        } else if (key === "certification" && !certificationFile && formData[key]) {
           data.append(key, formData[key]);
         }
       });
@@ -131,6 +152,10 @@ function ProfilePopup({ studentData, onClose, onSave }) {
 
       if (imageFile) {
         data.append("profileImage", imageFile);
+      }
+
+      if (certificationFile) {
+        data.append("certification", certificationFile);
       }
 
       const token = localStorage.getItem("hirebridge_token");
@@ -256,8 +281,33 @@ function ProfilePopup({ studentData, onClose, onSave }) {
                   </div>
 
                   <div className="profile-info-block" style={{ marginTop: "12px" }}>
-                    <span className="profile-info-label">Certifications</span>
-                    <p className="profile-block-text">{studentData?.certification || "No certifications uploaded yet."}</p>
+                    <span className="profile-info-label">Certifications (PDF)</span>
+                    <div className="resume-download-link">
+                      {studentData?.certification ? (
+                        <a
+                          href={
+                            studentData.certification.startsWith("http")
+                              ? studentData.certification
+                              : `http://localhost:5000${studentData.certification}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="popup-link"
+                          style={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: "6px",
+                            color: "#3b82f6",
+                            fontWeight: "600",
+                            textDecoration: "none"
+                          }}
+                        >
+                          📄 View Certificate PDF →
+                        </a>
+                      ) : (
+                        <span className="profile-info-val text-muted">No certifications uploaded yet.</span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="profile-info-block" style={{ marginTop: "12px" }}>
@@ -409,14 +459,19 @@ function ProfilePopup({ studentData, onClose, onSave }) {
               </div>
 
               <div className="form-group-popup">
-                <label>Certifications</label>
-                <textarea
-                  name="certification"
-                  value={formData.certification}
-                  onChange={handleChange}
-                  placeholder="List your professional credentials..."
-                  rows="2"
+                <label>Upload Certification (PDF File only)</label>
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleCertificationChange}
                 />
+                <p className="file-info-label">PDF document only (Max 5MB)</p>
+                {certificationFile && (
+                  <p className="file-ready-tag" style={{ color: "#10b981", margin: "5px 0 0 0", fontSize: "12px", fontWeight: "600" }}>✓ PDF Chosen: {certificationFile.name}</p>
+                )}
+                {studentData?.certification && !certificationFile && (
+                  <p className="resume-attached-note" style={{ color: "#3b82f6", margin: "5px 0 0 0", fontSize: "12px", fontWeight: "600" }}>✓ Certification PDF is already attached</p>
+                )}
               </div>
 
               <div className="form-row-popup">

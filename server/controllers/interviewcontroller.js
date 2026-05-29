@@ -45,7 +45,6 @@ const scheduleInterview = async (req, res) => {
       jobId,
       date,
       time,
-      googleMeetLink,
       instructions,
     } = req.body;
 
@@ -57,7 +56,6 @@ const scheduleInterview = async (req, res) => {
       jobId,
       date,
       time,
-      googleMeetLink,
       instructions,
       status: "Scheduled",
     });
@@ -67,7 +65,6 @@ const scheduleInterview = async (req, res) => {
       status: "Interview Scheduled",
       interviewDate: date,
       interviewTime: time,
-      interviewLink: googleMeetLink,
     });
 
     // Send notification to student

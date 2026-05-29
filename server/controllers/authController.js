@@ -142,6 +142,8 @@ const registerCompanyAuth = async (req, res) => {
       password: hashedPassword 
     });
 
+    const profilePhotoPath = req.file ? `/uploads/company/${req.file.filename}` : "https://i.pravatar.cc/150";
+
     // Create CompanyProfile record
     const companyProfile = await CompanyProfile.create({ 
       name, 
@@ -152,7 +154,9 @@ const registerCompanyAuth = async (req, res) => {
       location, 
       description, 
       password: hashedPassword,
-      confirmPassword: hashedPassword
+      confirmPassword: hashedPassword,
+      profilePhoto: profilePhotoPath,
+      companyLogo: profilePhotoPath
     });
 
     const token = generateToken(companyProfile._id, "company");

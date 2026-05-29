@@ -38,8 +38,7 @@ export const AdminDashboardLayout = ({ children }) => {
     { id: "jobs", label: "Jobs", icon: Briefcase, path: "/admin/jobs" },
     { id: "applications", label: "Applications", icon: FileSpreadsheet, path: "/admin/applications" },
     { id: "interviews", label: "Interviews", icon: Calendar, path: "/admin/interviews" },
-    { id: "notifications", label: "Announcements", icon: Bell, path: "/admin/notifications" },
-    { id: "reports", label: "Reports & Analytics", icon: BarChart3, path: "/admin/reports" },
+    { id: "notifications", label: "Notifications", icon: Bell, path: "/admin/notifications" },
     { id: "settings", label: "Settings", icon: Settings, path: "/admin/settings" },
   ];
 
@@ -230,51 +229,12 @@ export const AdminDashboardLayout = ({ children }) => {
           top: 0,
           zIndex: 40
         }}>
-          {/* Left search */}
-          <form onSubmit={handleGlobalSearch} style={{ display: "flex", alignItems: "center", position: "relative" }}>
-            <Search size={18} style={{
-              position: "absolute",
-              left: "12px",
-              color: darkMode ? "#64748b" : "#94a3b8"
-            }} />
-            <input
-              type="text"
-              placeholder="Search jobs, placement roles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              style={{
-                background: darkMode ? "rgba(30, 41, 59, 0.5)" : "#f8fafc",
-                borderRadius: "30px",
-                padding: "8px 15px 8px 40px",
-                fontSize: "13px",
-                width: "260px",
-                outline: "none",
-                color: darkMode ? "#ffffff" : "#1e293b",
-                border: darkMode ? "1px solid rgba(255, 255, 255, 0.05)" : "1px solid #cbd5e1"
-              }}
-            />
-          </form>
+          {/* Left spacer to keep alignment */}
+          <div style={{ display: "flex", flex: 1 }} />
 
           {/* Right widgets */}
           <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            {/* Theme selector */}
-            <button
-              onClick={() => setDarkMode(!darkMode)}
-              style={{
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                color: darkMode ? "#94a3b8" : "#64748b",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: "8px",
-                borderRadius: "50%",
-                backgroundColor: darkMode ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.03)"
-              }}
-            >
-              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
+
 
             {/* Notification system */}
             <div style={{ position: "relative", cursor: "pointer" }}>
