@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import StudentDashboardLayout from "./StudentDashboardLayout";
 import { jobAPI, studentAPI, applicationAPI } from "../../utils/studentDashboardAPI";
 import { formatDateToDDMMYYYY } from "../../utils/dateFormatter";
@@ -92,6 +93,12 @@ function Jobs() {
     e.preventDefault();
     if (!selectedJob) return;
 
+    // Direct CGPA eligibility check
+    if (student && student.cgpa !== undefined && student.cgpa !== null && student.cgpa < selectedJob.minimumCGPA) {
+      toast.error("You are not eligible for this job based on CGPA requirements.");
+      return;
+    }
+
     try {
       setSubmitting(true);
       await applicationAPI.createApplication({
@@ -103,14 +110,14 @@ function Jobs() {
         resume: applyForm.resume,
       });
 
-      alert("Application submitted successfully!");
+      toast.success("Application submitted successfully!");
       
       // Refresh list to update "Applied" button state
       const studentApps = await applicationAPI.getStudentApplications(studentId);
       setAppliedJobs(studentApps);
       handleCloseDetailsModal();
     } catch (err) {
-      alert("Application failed: " + err.message);
+      toast.error("Application failed: " + err.message);
     } finally {
       setSubmitting(false);
     }

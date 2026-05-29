@@ -26,6 +26,8 @@ const applicationroute = require("./routes/applicationrouter");
 app.use("/api", applicationroute);
 const interviewroute = require("./routes/interviewrouter");
 app.use("/api", interviewroute);
+const notificationroute = require("./routes/notificationrouter");
+app.use("/api", notificationroute);
 
 app.listen(5000, () => {
   console.log("server running");

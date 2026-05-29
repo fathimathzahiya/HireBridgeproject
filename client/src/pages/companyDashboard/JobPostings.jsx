@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import { jobAPI } from "../../utils/companyDashboardAPI";
 import "./JobPostings.css";
 
@@ -11,6 +12,11 @@ const JobPostings = () => {
   const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingJobId, setEditingJobId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [cgpaFilter, setCgpaFilter] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -57,13 +63,13 @@ const JobPostings = () => {
     try {
       if (editingJobId) {
         await jobAPI.updateJob(editingJobId, formData);
-        alert("Job updated successfully!");
+        toast.success("Job updated successfully!");
       } else {
         await jobAPI.createJob({
           ...formData,
           companyId,
         });
-        alert("Job posted successfully!");
+        toast.success("Job posted successfully!");
       }
       setFormData({
         title: "",
@@ -84,7 +90,7 @@ const JobPostings = () => {
       setShowForm(false);
       fetchJobs();
     } catch (err) {
-      alert("Error saving job: " + err.message);
+      toast.error("Error saving job: " + err.message);
     }
   };
 
@@ -112,10 +118,10 @@ const JobPostings = () => {
     if (window.confirm("Are you sure you want to delete this job?")) {
       try {
         await jobAPI.deleteJob(jobId);
-        alert("Job deleted successfully!");
+        toast.success("Job deleted successfully!");
         fetchJobs();
       } catch (err) {
-        alert("Error deleting job: " + err.message);
+        toast.error("Error deleting job: " + err.message);
       }
     }
   };
@@ -124,10 +130,10 @@ const JobPostings = () => {
     if (window.confirm("Are you sure you want to close this job posting?")) {
       try {
         await jobAPI.closeJob(jobId);
-        alert("Job closed successfully!");
+        toast.success("Job closed successfully!");
         fetchJobs();
       } catch (err) {
-        alert("Error closing job: " + err.message);
+        toast.error("Error closing job: " + err.message);
       }
     }
   };
@@ -135,6 +141,27 @@ const JobPostings = () => {
   if (loading && !showForm) {
     return <div className="loading">Loading job postings...</div>;
   }
+
+  // Extract unique filter options dynamically from jobs data
+  const uniqueLocations = [...new Set(jobs.map((job) => job.location))].filter(Boolean);
+  const uniqueRoles = [...new Set(jobs.map((job) => job.title))].filter(Boolean);
+  const uniqueStatuses = [...new Set(jobs.map((job) => job.status))].filter(Boolean);
+
+  // Compute filtered jobs
+  const filteredJobs = jobs.filter((job) => {
+    const matchesSearch =
+      !searchQuery ||
+      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (job.skillRequired && job.skillRequired.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const matchesRole = !roleFilter || job.title.toLowerCase() === roleFilter.toLowerCase();
+    const matchesLocation = !locationFilter || job.location.toLowerCase() === locationFilter.toLowerCase();
+    const matchesStatus = !statusFilter || job.status.toLowerCase() === statusFilter.toLowerCase();
+    const matchesCgpa = !cgpaFilter || parseFloat(job.minimumCGPA) <= parseFloat(cgpaFilter);
+
+    return matchesSearch && matchesRole && matchesLocation && matchesStatus && matchesCgpa;
+  });
 
   return (
     <div className="job-postings-container">
@@ -360,86 +387,233 @@ const JobPostings = () => {
       )}
 
       {!showForm && (
-        <div className="jobs-grid">
-          {jobs.length === 0 ? (
-            <div className="no-jobs">
-              <p>No job postings yet. Create your first job posting!</p>
+        <>
+          {/* Advanced Search & Filtering UI Panel */}
+          <div className="filter-search-container" style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "15px",
+            marginBottom: "25px",
+            padding: "20px",
+            backgroundColor: "#f8fafc",
+            borderRadius: "10px",
+            border: "1px solid #e2e8f0",
+            alignItems: "center"
+          }}>
+            {/* Search Input */}
+            <div style={{ flex: "2 1 300px", position: "relative" }}>
+              <input
+                type="text"
+                placeholder="🔍 Search jobs by title, description, skills..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px 15px",
+                  borderRadius: "6px",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "14px",
+                  boxSizing: "border-box",
+                  outline: "none",
+                  transition: "border-color 0.2s"
+                }}
+              />
             </div>
-          ) : (
-            jobs.map((job) => (
-              <div
-                key={job._id}
-                className="job-card"
-                onClick={() => navigate(`/company/${companyId}/jobs/${job._id}`)}
-                style={{ cursor: "pointer" }}
+
+            {/* Filter Dropdowns */}
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "10px",
+              flex: "3 1 450px"
+            }}>
+              <select
+                value={roleFilter}
+                onChange={(e) => setRoleFilter(e.target.value)}
+                style={{
+                  flex: "1 1 120px",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  border: "1px solid #cbd5e1",
+                  backgroundColor: "white",
+                  fontSize: "13px",
+                  cursor: "pointer"
+                }}
               >
-                <div className="job-header">
-                  <h3>{job.title}</h3>
-                  <span className={`job-status ${job.status.toLowerCase()}`}>
-                    {job.status}
-                  </span>
-                </div>
+                <option value="">All Roles</option>
+                {uniqueRoles.map(role => (
+                  <option key={role} value={role}>{role}</option>
+                ))}
+              </select>
 
-                <div className="job-details">
-                  <p>
-                    <strong>Salary:</strong> ₹{job.salary?.toLocaleString()}
-                  </p>
-                  <p>
-                    <strong>Location:</strong> {job.location}
-                  </p>
-                  <p>
-                    <strong>Job Type:</strong> {job.jobType}
-                  </p>
-                  <p>
-                    <strong>Department:</strong> {job.department}
-                  </p>
-                  <p>
-                    <strong>Vacancies:</strong> {job.vaccancy}
-                  </p>
-                  <p>
-                    <strong>Min CGPA:</strong> {job.minimumCGPA}
-                  </p>
-                </div>
+              <select
+                value={locationFilter}
+                onChange={(e) => setLocationFilter(e.target.value)}
+                style={{
+                  flex: "1 1 120px",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  border: "1px solid #cbd5e1",
+                  backgroundColor: "white",
+                  fontSize: "13px",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="">All Locations</option>
+                {uniqueLocations.map(loc => (
+                  <option key={loc} value={loc}>{loc}</option>
+                ))}
+              </select>
 
-                <div className="job-description">
-                  <p>{job.description.substring(0, 150)}...</p>
-                </div>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                style={{
+                  flex: "1 1 120px",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  border: "1px solid #cbd5e1",
+                  backgroundColor: "white",
+                  fontSize: "13px",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="">All Statuses</option>
+                {uniqueStatuses.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
 
-                <div className="job-actions">
-                  <button
-                    className="btn-edit"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEdit(job);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  {job.status === "Open" && (
+              <select
+                value={cgpaFilter}
+                onChange={(e) => setCgpaFilter(e.target.value)}
+                style={{
+                  flex: "1 1 120px",
+                  padding: "10px",
+                  borderRadius: "6px",
+                  border: "1px solid #cbd5e1",
+                  backgroundColor: "white",
+                  fontSize: "13px",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="">Min CGPA Eligibility</option>
+                <option value="6">6.0 CGPA & Under</option>
+                <option value="7">7.0 CGPA & Under</option>
+                <option value="8">8.0 CGPA & Under</option>
+                <option value="9">9.0 CGPA & Under</option>
+              </select>
+
+              {(searchQuery || roleFilter || locationFilter || statusFilter || cgpaFilter) && (
+                <button
+                  onClick={() => {
+                    setSearchQuery("");
+                    setRoleFilter("");
+                    setLocationFilter("");
+                    setStatusFilter("");
+                    setCgpaFilter("");
+                  }}
+                  style={{
+                    padding: "10px 15px",
+                    backgroundColor: "#ef4444",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "6px",
+                    cursor: "pointer",
+                    fontSize: "13px",
+                    fontWeight: "600",
+                    transition: "background-color 0.2s"
+                  }}
+                  onMouseOver={(e) => e.target.style.backgroundColor = "#dc2626"}
+                  onMouseOut={(e) => e.target.style.backgroundColor = "#ef4444"}
+                >
+                  Clear Filters
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="jobs-grid">
+            {filteredJobs.length === 0 ? (
+              <div className="no-jobs">
+                <p>No matching job postings found.</p>
+              </div>
+            ) : (
+              filteredJobs.map((job) => (
+                <div
+                  key={job._id}
+                  className="job-card"
+                  onClick={() => navigate(`/company/${companyId}/jobs/${job._id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <div className="job-header">
+                    <h3>{job.title}</h3>
+                    <span className={`job-status ${job.status.toLowerCase()}`}>
+                      {job.status}
+                    </span>
+                  </div>
+
+                  <div className="job-details">
+                    <p>
+                      <strong>Salary:</strong> ₹{job.salary?.toLocaleString()}
+                    </p>
+                    <p>
+                      <strong>Location:</strong> {job.location}
+                    </p>
+                    <p>
+                      <strong>Job Type:</strong> {job.jobType}
+                    </p>
+                    <p>
+                      <strong>Department:</strong> {job.department}
+                    </p>
+                    <p>
+                      <strong>Vacancies:</strong> {job.vaccancy}
+                    </p>
+                    <p>
+                      <strong>Min CGPA:</strong> {job.minimumCGPA}
+                    </p>
+                  </div>
+
+                  <div className="job-description">
+                    <p>{job.description.substring(0, 150)}...</p>
+                  </div>
+
+                  <div className="job-actions">
                     <button
-                      className="btn-close"
+                      className="btn-edit"
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleCloseJob(job._id);
+                        handleEdit(job);
                       }}
                     >
-                      Close
+                      Edit
                     </button>
-                  )}
-                  <button
-                    className="btn-delete"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(job._id);
-                    }}
-                  >
-                    Delete
-                  </button>
+                    {job.status === "Open" && (
+                      <button
+                        className="btn-close"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCloseJob(job._id);
+                        }}
+                      >
+                        Close
+                      </button>
+                    )}
+                    <button
+                      className="btn-delete"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(job._id);
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
-          )}
-        </div>
+              ))
+            )}
+          </div>
+        </>
       )}
     </div>
   );

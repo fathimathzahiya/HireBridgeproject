@@ -54,6 +54,14 @@ export const interviewAPI = {
   getStudentUpcomingInterviews: (studentId) => fetchWithAuth(`${API_BASE_URL}/student/${studentId}/interviews/upcoming`),
 };
 
+// Notification APIs
+export const notificationAPI = {
+  getStudentNotifications: (studentId) => fetchWithAuth(`${API_BASE_URL}/notifications/student/${studentId}`),
+  markAsRead: (notificationId) => fetchWithAuth(`${API_BASE_URL}/notifications/${notificationId}/read`, { method: 'PUT' }),
+  markAllAsRead: (studentId) => fetchWithAuth(`${API_BASE_URL}/notifications/student/${studentId}/read-all`, { method: 'PUT' }),
+  deleteNotification: (notificationId) => fetchWithAuth(`${API_BASE_URL}/notifications/${notificationId}`, { method: 'DELETE' }),
+};
+
 // Utility functions
 export const filterApplicationsByStudent = (applications, studentId) => {
   return applications.filter(app => app.studentId === studentId);

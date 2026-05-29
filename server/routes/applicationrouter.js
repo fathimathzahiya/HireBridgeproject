@@ -10,6 +10,7 @@ const {
   getCompanyApplicantsByStatus,
   updateApplicationStatus,
   addApplicationNotes,
+  viewResume,
 } = require("../controllers/applicationcontroller");
 
 // ===== STUDENT APPLICATION ROUTES =====
@@ -23,5 +24,8 @@ applicationrouter.get("/job/:jobId/applicants", protect, companyOnly, getJobAppl
 applicationrouter.get("/company/:companyId/applicants/:status", protect, companyOnly, getCompanyApplicantsByStatus);
 applicationrouter.put("/applications/:applicationId/status", protect, companyOnly, updateApplicationStatus);
 applicationrouter.put("/applications/:applicationId/notes", protect, companyOnly, addApplicationNotes);
+
+// ===== SECURE RESUME VIEWING =====
+applicationrouter.get("/applications/resume/:filename", protect, viewResume);
 
 module.exports = applicationrouter;

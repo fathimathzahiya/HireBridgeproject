@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import { companyAPI } from "../../utils/companyDashboardAPI";
 import "./CompanyProfile.css";
 
@@ -61,11 +62,11 @@ const CompanyProfile = () => {
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith("image/")) {
-        alert("Please upload an image file");
+        toast.warning("Please upload an image file");
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        alert("File size must be less than 5MB");
+        toast.warning("File size must be less than 5MB");
         return;
       }
       setLogoFile(file);
@@ -106,9 +107,9 @@ const CompanyProfile = () => {
       }
       setLogoFile(null);
       setIsEditing(false);
-      alert("Company profile updated successfully!");
+      toast.success("Company profile updated successfully!");
     } catch (err) {
-      alert("Error updating profile: " + err.message);
+      toast.error("Error updating profile: " + err.message);
     }
   };
 

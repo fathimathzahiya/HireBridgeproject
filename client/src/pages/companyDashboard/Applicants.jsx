@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   applicationAPI,
   getApplicationStatusColor,
@@ -17,6 +18,38 @@ const Applicants = () => {
   const [selectedApplicant, setSelectedApplicant] = useState(null);
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [noteText, setNoteText] = useState("");
+
+  const handleViewResume = async (resumePath) => {
+    if (!resumePath) {
+      toast.error("No resume uploaded by this student.");
+      return;
+    }
+    
+    try {
+      const token = localStorage.getItem("hirebridge_token");
+      let url = resumePath;
+      if (!resumePath.startsWith("http")) {
+        const filename = resumePath.replace("/uploads/", "");
+        url = `http://localhost:5000/api/applications/resume/${filename}`;
+      }
+      
+      const response = await fetch(url, {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error("Unable to fetch resume from backend");
+      }
+      
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, "_blank");
+    } catch (err) {
+      toast.error("Failed to load resume: " + err.message);
+    }
+  };
   
   // Interview scheduling modal states
   const [showScheduleModal, setShowScheduleModal] = useState(false);
@@ -74,17 +107,17 @@ const Applicants = () => {
       await applicationAPI.updateApplicationStatus(applicantId, {
         status: newStatus,
       });
-      alert("Application status updated!");
+      toast.success("Application status updated!");
       fetchApplicants();
     } catch (err) {
-      alert("Error updating status: " + err.message);
+      toast.error("Error updating status: " + err.message);
     }
   };
 
   const handleScheduleSubmit = async (e) => {
     e.preventDefault();
     if (!schedLink || !schedDate || !schedTime) {
-      alert("Please fill in all interview fields.");
+      toast.warning("Please fill in all interview fields.");
       return;
     }
     try {
@@ -94,11 +127,11 @@ const Applicants = () => {
         interviewDate: schedDate,
         interviewTime: schedTime,
       });
-      alert("Interview scheduled successfully!");
+      toast.success("Interview scheduled successfully!");
       setShowScheduleModal(false);
       fetchApplicants();
     } catch (err) {
-      alert("Error scheduling interview: " + err.message);
+      toast.error("Error scheduling interview: " + err.message);
     }
   };
 
@@ -106,12 +139,12 @@ const Applicants = () => {
     if (!noteText.trim()) return;
     try {
       await applicationAPI.addApplicationNotes(selectedApplicant._id, noteText);
-      alert("Note added successfully!");
+      toast.success("Note added successfully!");
       setNoteText("");
       setShowNoteForm(false);
       fetchApplicants();
     } catch (err) {
-      alert("Error adding note: " + err.message);
+      toast.error("Error adding note: " + err.message);
     }
   };
 
@@ -205,6 +238,16 @@ const Applicants = () => {
                   View Details
                 </button>
 
+                {applicant.studentId?.resume && (
+                  <button
+                    className="btn-view"
+                    style={{ backgroundColor: "#0284c7", color: "white" }}
+                    onClick={() => handleViewResume(applicant.studentId.resume)}
+                  >
+                    📄 Resume
+                  </button>
+                )}
+
                 <button
                   className="btn-note"
                   onClick={() => {
@@ -261,6 +304,26 @@ const Applicants = () => {
                 <strong>Address:</strong>{" "}
                 {selectedApplicant.studentId?.address || "N/A"}
               </p>
+              {selectedApplicant.studentId?.resume && (
+                <p>
+                  <strong>Resume:</strong>{" "}
+                  <button 
+                    onClick={() => handleViewResume(selectedApplicant.studentId.resume)}
+                    style={{
+                      background: "#0284c7",
+                      color: "white",
+                      border: "none",
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "12px",
+                      marginLeft: "5px"
+                    }}
+                  >
+                    View Resume PDF 📄
+                  </button>
+                </p>
+              )}
             </div>
 
             <div className="detail-section">

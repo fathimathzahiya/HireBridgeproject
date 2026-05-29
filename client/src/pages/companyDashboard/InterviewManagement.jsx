@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import {
   interviewAPI,
   applicationAPI,
@@ -75,7 +76,7 @@ const InterviewManagement = () => {
         !formData.time ||
         !formData.googleMeetLink
       ) {
-        alert("Please fill all required fields");
+        toast.warning("Please fill all required fields");
         return;
       }
 
@@ -91,7 +92,7 @@ const InterviewManagement = () => {
         instructions: formData.instructions,
       });
 
-      alert("Interview scheduled successfully!");
+      toast.success("Interview scheduled successfully!");
       setFormData({
         applicationId: "",
         date: "",
@@ -103,7 +104,7 @@ const InterviewManagement = () => {
       fetchInterviews();
       fetchApplicants();
     } catch (err) {
-      alert("Error scheduling interview: " + err.message);
+      toast.error("Error scheduling interview: " + err.message);
     }
   };
 
@@ -113,10 +114,24 @@ const InterviewManagement = () => {
         result,
         feedback,
       });
-      alert("Interview result updated!");
+      toast.success(`Candidate marked as ${result}!`);
       fetchInterviews();
     } catch (err) {
-      alert("Error updating result: " + err.message);
+      toast.error("Error updating result: " + err.message);
+    }
+  };
+
+  const handleManualComplete = async (interviewId) => {
+    if (window.confirm("Are you sure you want to mark this interview as completed?")) {
+      try {
+        await interviewAPI.updateInterviewStatus(interviewId, {
+          status: "Completed",
+        });
+        toast.success("Interview status marked as Completed!");
+        fetchInterviews();
+      } catch (err) {
+        toast.error("Error updating status: " + err.message);
+      }
     }
   };
 
@@ -124,10 +139,10 @@ const InterviewManagement = () => {
     if (window.confirm("Are you sure you want to cancel this interview?")) {
       try {
         await interviewAPI.cancelInterview(interviewId);
-        alert("Interview cancelled!");
+        toast.success("Interview cancelled!");
         fetchInterviews();
       } catch (err) {
-        alert("Error cancelling interview: " + err.message);
+        toast.error("Error cancelling interview: " + err.message);
       }
     }
   };
@@ -315,12 +330,21 @@ const InterviewManagement = () => {
                   )}
 
                   {interview.status === "Scheduled" && (
-                    <button
-                      className="btn-cancel"
-                      onClick={() => handleCancelInterview(interview._id)}
-                    >
-                      Cancel Interview
-                    </button>
+                    <div className="interview-actions">
+                      <button
+                        className="btn-select"
+                        onClick={() => handleManualComplete(interview._id)}
+                        style={{ backgroundColor: "#10b981", color: "white", marginRight: "10px" }}
+                      >
+                        ✓ Complete
+                      </button>
+                      <button
+                        className="btn-cancel"
+                        onClick={() => handleCancelInterview(interview._id)}
+                      >
+                        Cancel Interview
+                      </button>
+                    </div>
                   )}
                 </div>
               ))}

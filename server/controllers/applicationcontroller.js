@@ -9,6 +9,23 @@ const applyForJob = async (req, res) => {
   try {
     const { studentId, jobId, companyId, phone, coverLetter, resume } = req.body;
 
+    // Fetch the Job and Student to validate CGPA eligibility
+    const job = await Job.findById(jobId);
+    const student = await Student.findById(studentId);
+
+    if (!job) {
+      return res.status(404).json({ error: "Job posting not found" });
+    }
+    if (!student) {
+      return res.status(404).json({ error: "Student profile not found" });
+    }
+
+    if (student.cgpa !== undefined && student.cgpa !== null && student.cgpa < job.minimumCGPA) {
+      return res.status(400).json({
+        error: `You are not eligible for this job based on CGPA requirements. Required: ${job.minimumCGPA}, Your CGPA: ${student.cgpa}`
+      });
+    }
+
     // Check if student already applied
     const existingApplication = await Application.findOne({
       studentId,
@@ -174,6 +191,39 @@ const updateApplicationStatus = async (req, res) => {
       );
     }
 
+    // Automatically create a notification for the student
+    const notificationStatuses = ["Shortlisted", "Interview Scheduled", "Selected", "Rejected"];
+    if (notificationStatuses.includes(status)) {
+      const Notification = require("../models/notificationmodel");
+      let message = "";
+      let type = "Other";
+
+      if (status === "Shortlisted") {
+        message = `Good news! Your application for the ${application.jobId?.title} role at ${application.companyId?.name} has been Shortlisted.`;
+        type = "Shortlisted";
+      } else if (status === "Interview Scheduled") {
+        const dateStr = interviewDate || application.interviewDate || "";
+        const timeStr = interviewTime || application.interviewTime || "";
+        message = `Your interview for the ${application.jobId?.title} role at ${application.companyId?.name} has been scheduled for ${dateStr} at ${timeStr}.`;
+        type = "InterviewScheduled";
+      } else if (status === "Selected") {
+        message = `Congratulations! You have been Selected for the ${application.jobId?.title} role at ${application.companyId?.name}. Check your dashboard!`;
+        type = "Selected";
+      } else if (status === "Rejected") {
+        message = `Thank you for applying. We regret to inform you that your application for ${application.jobId?.title} at ${application.companyId?.name} has been rejected.`;
+        type = "Rejected";
+      }
+
+      await Notification.create({
+        studentId: application.studentId._id || application.studentId,
+        applicationId: application._id,
+        companyId: application.companyId._id || application.companyId,
+        jobId: application.jobId._id || application.jobId,
+        message,
+        type,
+      });
+    }
+
     res.json(application);
   } catch (error) {
     console.error(error);
@@ -200,6 +250,26 @@ const addApplicationNotes = async (req, res) => {
   }
 };
 
+const fs = require("fs");
+const path = require("path");
+
+const viewResume = async (req, res) => {
+  try {
+    const { filename } = req.params;
+    const filePath = path.resolve(__dirname, "../uploads", filename);
+
+    if (fs.existsSync(filePath)) {
+      res.setHeader("Content-Type", "application/pdf");
+      res.sendFile(filePath);
+    } else {
+      res.status(404).json({ error: "Resume file not found" });
+    }
+  } catch (error) {
+    console.error("Error viewing resume:", error);
+    res.status(500).json({ error: "Unable to load resume file" });
+  }
+};
+
 module.exports = {
   applyForJob,
   getStudentApplications,
@@ -209,7 +279,7 @@ module.exports = {
   getCompanyApplicantsByStatus,
   updateApplicationStatus,
   addApplicationNotes,
-
+  viewResume,
 };
 
           
