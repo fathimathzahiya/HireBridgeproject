@@ -38,10 +38,12 @@ function Jobs() {
       setError("Student ID not found. Please log in.");
       setLoading(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [studentId]);
 
   useEffect(() => {
     filterJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [jobs, searchTerm, cgpaFilter]);
 
   const filterJobs = () => {

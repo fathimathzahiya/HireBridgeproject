@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -10,6 +10,18 @@ export const CompanyAuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("hirebridge_token") || null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("hirebridge_token");
+    localStorage.removeItem("hirebridge_user");
+    localStorage.removeItem("companyId");
+    localStorage.removeItem("companyName");
+    localStorage.removeItem("companyEmail");
+    setToken(null);
+    setCompany(null);
+    toast.info("Logged out of Company Recruiter Session.");
+    navigate("/companylogin");
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCompanyProfile = async () => {
@@ -39,7 +51,7 @@ export const CompanyAuthProvider = ({ children }) => {
     };
 
     fetchCompanyProfile();
-  }, [token]);
+  }, [token, handleLogout]);
 
   const handleLogin = async (email, password) => {
     try {
@@ -65,18 +77,6 @@ export const CompanyAuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("hirebridge_token");
-    localStorage.removeItem("hirebridge_user");
-    localStorage.removeItem("companyId");
-    localStorage.removeItem("companyName");
-    localStorage.removeItem("companyEmail");
-    setToken(null);
-    setCompany(null);
-    toast.info("Logged out of Company Recruiter Session.");
-    navigate("/companylogin");
   };
 
   const updateCompanyState = (updatedCompany) => {

@@ -3,12 +3,10 @@ import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import CompanyProfilePopup from "../../components/CompanyProfilePopup/CompanyProfilePopup";
 import { toast } from "react-toastify";
 import { 
-  Bell, 
+  Bell,
   Trash2, 
   Check, 
   Clock, 
-  Building2, 
-  User, 
   Briefcase 
 } from "lucide-react";
 import "./CompanyDashboardLayout.css";
@@ -137,6 +135,7 @@ const CompanyDashboardLayout = ({ children }) => {
     
     fetchCompanyData(companyId || storedCompanyId);
     fetchNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
   useEffect(() => {
@@ -146,6 +145,7 @@ const CompanyDashboardLayout = ({ children }) => {
     }, 10000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastNotifCount]);
 
   useEffect(() => {
@@ -154,6 +154,7 @@ const CompanyDashboardLayout = ({ children }) => {
     if (menuItems.some((item) => item.id === lastPart)) {
       setActiveMenu(lastPart);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location]);
 
   const handleLogout = () => {

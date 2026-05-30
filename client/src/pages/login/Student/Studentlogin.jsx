@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 import './Studentlogin.css'
-import { MdHomeRepairService } from "react-icons/md";
-import { BiHide } from "react-icons/bi";
 import { Link } from 'react-router-dom';
 
 function Studentlogin() {

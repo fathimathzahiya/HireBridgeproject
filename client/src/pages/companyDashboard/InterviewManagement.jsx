@@ -30,6 +30,7 @@ const InterviewManagement = () => {
   useEffect(() => {
     fetchInterviews();
     fetchApplicants();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
   const fetchInterviews = async () => {

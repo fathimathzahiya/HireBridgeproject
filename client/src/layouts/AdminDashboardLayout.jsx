@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { adminService } from "../services/adminService";
 import { toast } from "react-toastify";
 import { useAdminAuth } from "../context/AdminAuthContext";
@@ -11,30 +11,25 @@ import {
   FileSpreadsheet,
   Calendar,
   Bell,
-  BarChart3,
   Settings,
   LogOut,
   Menu,
   X,
-  Search,
-  Sun,
-  Moon,
-  ChevronDown,
   Trash2,
   Check
 } from "lucide-react";
 
 export const AdminDashboardLayout = ({ children }) => {
-  const { admin, logout } = useAdminAuth();
+  const { logout } = useAdminAuth();
   const location = useLocation();
-  const navigate = useNavigate();
+  // eslint-disable-next-line no-unused-vars
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [darkMode, setDarkMode] = useState(() => {
+  const [darkMode] = useState(() => {
     return localStorage.getItem("admin_theme") === "dark";
   });
   const [notificationDropdownOpen, setNotificationDropdownOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
-  const [searchQuery, setSearchQuery] = useState("");
+  
 
   const menuItems = [
     { id: "overview", label: "Dashboard", icon: LayoutDashboard, path: "/admin/overview" },
@@ -97,14 +92,6 @@ export const AdminDashboardLayout = ({ children }) => {
   };
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
-
-  const handleGlobalSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      // Redirect to jobs or students based on query or just trigger general alert
-      navigate(`/admin/jobs?search=${encodeURIComponent(searchQuery)}`);
-    }
-  };
 
   return (
     <div style={{

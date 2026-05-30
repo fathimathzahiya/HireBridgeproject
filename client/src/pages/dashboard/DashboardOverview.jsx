@@ -10,7 +10,6 @@ function DashboardOverview() {
     selectedJobs: 0,
   });
   const [studentData, setStudentData] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchDashboardData();
@@ -18,7 +17,6 @@ function DashboardOverview() {
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
       const studentId = localStorage.getItem("studentId");
       const token = localStorage.getItem("hirebridge_token");
       
@@ -68,8 +66,6 @@ function DashboardOverview() {
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
-    } finally {
-      setLoading(false);
     }
   };
 

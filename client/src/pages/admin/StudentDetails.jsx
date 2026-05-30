@@ -1,16 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { X, FileText, Globe, ShieldAlert, Award } from "lucide-react";
+import React, { useState, useEffect, useCallback } from "react";
+import { X, FileText, Globe } from "lucide-react";
 import { adminService } from "../../services/adminService";
 
 export const StudentDetails = ({ student, onClose, onViewResume }) => {
   const [applications, setApplications] = useState([]);
   const [loadingApps, setLoadingApps] = useState(false);
 
-  useEffect(() => {
-    fetchStudentApplications();
-  }, [student._id]);
-
-  const fetchStudentApplications = async () => {
+  const fetchStudentApplications = useCallback(async () => {
     try {
       setLoadingApps(true);
       const data = await adminService.getApplications();
@@ -21,7 +17,11 @@ export const StudentDetails = ({ student, onClose, onViewResume }) => {
     } finally {
       setLoadingApps(false);
     }
-  };
+  }, [student._id]);
+
+  useEffect(() => {
+    fetchStudentApplications();
+  }, [fetchStudentApplications]);
 
   return (
     <div style={{
@@ -78,7 +78,7 @@ export const StudentDetails = ({ student, onClose, onViewResume }) => {
                 ? student.profileImage
                 : `http://localhost:5000${student.profileImage}`
             }
-            alt="student photo"
+            alt="student"
             style={{
               width: "72px",
               height: "72px",

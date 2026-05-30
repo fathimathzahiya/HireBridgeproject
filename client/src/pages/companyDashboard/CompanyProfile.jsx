@@ -27,6 +27,7 @@ const CompanyProfile = () => {
 
   useEffect(() => {
     fetchCompanyProfile();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
   const fetchCompanyProfile = async () => {

@@ -6,8 +6,6 @@ import {
   XCircle,
   Edit,
   Trash2,
-  AlertTriangle,
-  Briefcase
 } from "lucide-react";
 
 export const JobManagement = () => {

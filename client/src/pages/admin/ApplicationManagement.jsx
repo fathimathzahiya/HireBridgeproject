@@ -4,11 +4,9 @@ import { toast } from "react-toastify";
 import {
   Search,
   Trash2,
-  FileSpreadsheet,
   Clock,
   CheckCircle,
   XCircle,
-  HelpCircle
 } from "lucide-react";
 
 export const ApplicationManagement = () => {

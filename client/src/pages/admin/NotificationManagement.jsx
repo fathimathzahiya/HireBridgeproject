@@ -1,18 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { adminService } from "../../services/adminService";
 import { toast } from "react-toastify";
-import { motion } from "framer-motion";
 import { 
-  Bell, 
   Trash2, 
   Search, 
-  Filter, 
   Clock, 
-  CheckCircle2, 
   AlertTriangle,
   Info,
   Calendar,
-  Layers,
   Award
 } from "lucide-react";
 
