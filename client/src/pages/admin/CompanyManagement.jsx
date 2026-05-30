@@ -6,12 +6,10 @@ import { CompanyDetails } from "./CompanyDetails";
 import {
   Search,
   Check,
-  X,
   Lock,
   Unlock,
   Trash2,
   Eye,
-  Building2,
   PlusCircle
 } from "lucide-react";
 

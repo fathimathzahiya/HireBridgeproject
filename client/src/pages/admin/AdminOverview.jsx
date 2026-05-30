@@ -8,7 +8,6 @@ import {
   FileText,
   Calendar,
   Award,
-  CheckCircle,
   TrendingUp
 } from "lucide-react";
 
@@ -44,7 +43,7 @@ export const AdminOverview = () => {
     );
   }
 
-  const { stats, charts, recentActivity } = data || {};
+  const { stats } = data || {};
 
   const cardData = [
     { label: "Total Students", value: stats?.totalStudents || 0, icon: Users, color: "#3b82f6" },

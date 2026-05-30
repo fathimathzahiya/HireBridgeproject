@@ -251,9 +251,11 @@ export const sortApplicantsByDate = (applicants, order = "desc") => {
   });
 };
 
-export default {
+const companyDashboardAPI = {
   companyAPI,
   jobAPI,
   applicationAPI,
   interviewAPI,
 };
+
+export default companyDashboardAPI;

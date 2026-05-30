@@ -70,6 +70,7 @@ const Applicants = () => {
 
   useEffect(() => {
     fetchApplicants();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId, filterStatus]);
 
   const fetchApplicants = async () => {

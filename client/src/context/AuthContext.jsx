@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -10,6 +10,17 @@ export const StudentAuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("hirebridge_token") || null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("hirebridge_token");
+    localStorage.removeItem("hirebridge_user");
+    localStorage.removeItem("studentId");
+    localStorage.removeItem("studentName");
+    setToken(null);
+    setStudent(null);
+    toast.info("Logged out of Student Session.");
+    navigate("/studentlogin");
+  }, [navigate]);
 
   useEffect(() => {
     const fetchStudentProfile = async () => {
@@ -39,7 +50,7 @@ export const StudentAuthProvider = ({ children }) => {
     };
 
     fetchStudentProfile();
-  }, [token]);
+  }, [token, handleLogout]);
 
   const handleLogin = async (email, password) => {
     try {
@@ -64,17 +75,6 @@ export const StudentAuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("hirebridge_token");
-    localStorage.removeItem("hirebridge_user");
-    localStorage.removeItem("studentId");
-    localStorage.removeItem("studentName");
-    setToken(null);
-    setStudent(null);
-    toast.info("Logged out of Student Session.");
-    navigate("/studentlogin");
   };
 
   const updateStudentState = (updatedStudent) => {

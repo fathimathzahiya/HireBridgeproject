@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { toast } from "react-toastify";
 import StudentDashboardLayout from "./StudentDashboardLayout";
 import { applicationAPI } from "../../utils/studentDashboardAPI";
 import { formatDateToDDMMYYYY } from "../../utils/dateFormatter";
@@ -19,6 +18,7 @@ function AppliedJobs() {
 
   useEffect(() => {
     filterAndSearchApplications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applications, searchTerm, selectedFilter]);
 
   const fetchAppliedJobs = async () => {

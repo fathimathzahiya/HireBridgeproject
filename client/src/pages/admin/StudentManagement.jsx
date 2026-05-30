@@ -5,14 +5,11 @@ import { toast } from "react-toastify";
 import { StudentDetails } from "./StudentDetails";
 import {
   Search,
-  Filter,
   Eye,
   Edit2,
   Trash2,
   Lock,
   Unlock,
-  FileText,
-  Plus,
   UserPlus
 } from "lucide-react";
 
@@ -25,7 +22,6 @@ export const StudentManagement = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [deptFilter, setDeptFilter] = useState("");
   const [cgpaFilter, setCgpaFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
   const [blockFilter, setBlockFilter] = useState("");
 
   // Edit Form State

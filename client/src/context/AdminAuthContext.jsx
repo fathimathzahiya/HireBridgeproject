@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { adminService } from "../services/adminService";
@@ -10,6 +10,15 @@ export const AdminAuthProvider = ({ children }) => {
   const [token, setToken] = useState(localStorage.getItem("hirebridge_token") || null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("hirebridge_token");
+    localStorage.removeItem("hirebridge_user");
+    setToken(null);
+    setAdmin(null);
+    toast.info("Logged out of Admin Session.");
+    navigate("/admin/login");
+  }, [navigate]);
 
   useEffect(() => {
     const fetchAdminProfile = async () => {
@@ -35,7 +44,7 @@ export const AdminAuthProvider = ({ children }) => {
     };
 
     fetchAdminProfile();
-  }, [token]);
+  }, [token, handleLogout]);
 
   const handleLogin = async (email, password) => {
     try {
@@ -57,15 +66,6 @@ export const AdminAuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("hirebridge_token");
-    localStorage.removeItem("hirebridge_user");
-    setToken(null);
-    setAdmin(null);
-    toast.info("Logged out of Admin Session.");
-    navigate("/admin/login");
   };
 
   const updateAdminState = (updatedAdmin) => {

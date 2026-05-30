@@ -34,6 +34,7 @@ const JobPostings = () => {
 
   useEffect(() => {
     fetchJobs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [companyId]);
 
   const fetchJobs = async () => {

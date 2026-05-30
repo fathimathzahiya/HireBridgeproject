@@ -1,5 +1,5 @@
 import React from "react";
-import { X, Globe, Phone, MapPin, Mail, Calendar, Briefcase } from "lucide-react";
+import { X, Globe, Phone, MapPin, Mail } from "lucide-react";
 
 export const CompanyDetails = ({ company, onClose, jobsCount, jobsData }) => {
   const companyJobs = jobsData.filter((job) => (job.companyId?._id || job.companyId) === company._id);

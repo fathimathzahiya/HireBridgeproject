@@ -4,11 +4,6 @@ import { toast } from "react-toastify";
 import {
   Search,
   Calendar,
-  Check,
-  XCircle,
-  Video,
-  Clock,
-  Briefcase
 } from "lucide-react";
 
 export const AdminInterviewManagement = () => {
