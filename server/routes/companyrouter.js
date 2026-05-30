@@ -16,17 +16,15 @@ const {
 
 // ===== COMPANY PROFILE ROUTES =====
 companyrouter.get("/companies", protect, getAllCompanies);
-companyrouter.get("/company/:companyId", protect, getSingleCompany);
+companyrouter.get("/company/notifications", protect, companyOnly, getCompanyNotifications);
+companyrouter.patch("/company/notifications/read/:id", protect, companyOnly, markCompanyNotificationAsRead);
+companyrouter.delete("/company/notifications/:id", protect, companyOnly, deleteCompanyNotification);
 companyrouter.get("/company/:companyId/dashboard", protect, companyOnly, getCompanyDashboard);
 companyrouter.put("/company/:companyId", protect, companyOnly, upload.fields([
   { name: "companyLogo", maxCount: 1 },
   { name: "profilePhoto", maxCount: 1 }
 ]), updateCompanyProfile);
+companyrouter.get("/company/:companyId", protect, getSingleCompany);
 companyrouter.put("/company/update-profile-photo", protect, companyOnly, companyUpload.single("profilePhoto"), updateCompanyProfilePhoto);
-
-// ===== COMPANY NOTIFICATION SYSTEM =====
-companyrouter.get("/company/notifications", protect, companyOnly, getCompanyNotifications);
-companyrouter.patch("/company/notifications/read/:id", protect, companyOnly, markCompanyNotificationAsRead);
-companyrouter.delete("/company/notifications/:id", protect, companyOnly, deleteCompanyNotification);
 
 module.exports = companyrouter;

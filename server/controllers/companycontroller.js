@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const Company = require("../models/companymodel");
 const Job = require("../models/jobmodel");
 const Application = require("../models/applicationmodel");
@@ -9,6 +10,10 @@ const CompanyNotification = require("../models/companynotificationmodel");
 const getCompanyDashboard = async (req, res) => {
   try {
     const { companyId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      return res.status(400).json({ error: "Invalid company ID" });
+    }
 
     const company = await Company.findById(companyId);
     if (!company) {
@@ -56,6 +61,11 @@ const getCompanyDashboard = async (req, res) => {
 const getSingleCompany = async (req, res) => {
   try {
     const { companyId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(companyId)) {
+      return res.status(400).json({ error: "Invalid company ID" });
+    }
+
     const company = await Company.findById(companyId);
 
     if (!company) {
