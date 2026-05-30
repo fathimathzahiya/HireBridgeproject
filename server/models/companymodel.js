@@ -7,6 +7,12 @@ const companySchema = new Schema(
       required: true,
     },
 
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+
     website: {
       type: String,
       required: true,
@@ -19,7 +25,7 @@ const companySchema = new Schema(
 
     description: {
       type: String,
-      required: true,
+      required: false,
     },
 
     HRName: {
@@ -27,17 +33,74 @@ const companySchema = new Schema(
       required: true,
     },
 
+    HREmail: {
+      type: String,
+      required: false,
+    },
+
     phoneNumber: {
+      type: String,
+      required: true,
+    },
+
+    companyLogo: {
+      type: String,
+      default: "https://i.pravatar.cc/150",
+    },
+
+    profilePhoto: {
+      type: String,
+      default: "https://i.pravatar.cc/150",
+    },
+
+    aboutCompany: {
+      type: String,
+      required: false,
+    },
+
+    password: {
+      type: String,
+      required: true,
+    },
+
+    confirmPassword: {
+      type: String,
+      required: true,
+    },
+
+    foundedYear: {
       type: Number,
-      required: true,
+      required: false,
     },
-     password: {
-      type: String,
-      required: true,
+
+    employees: {
+      type: Number,
+      required: false,
     },
-     confirmPassword: {
+
+    country: {
       type: String,
-      required: true,
+      required: false,
+    },
+
+    city: {
+      type: String,
+      required: false,
+    },
+
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
+
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
     },
   },
 );

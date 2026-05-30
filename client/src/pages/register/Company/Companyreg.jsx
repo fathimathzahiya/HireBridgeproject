@@ -14,7 +14,25 @@ function Companyreg() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [statusMessage, setStatusMessage] = useState("")
+  const [profilePhoto, setProfilePhoto] = useState(null)
+  const [photoPreview, setPhotoPreview] = useState(null)
   const navigate = useNavigate()
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setStatusMessage("Please select an image file only.")
+        return
+      }
+      setProfilePhoto(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -26,18 +44,32 @@ function Companyreg() {
     }
 
     try {
-      await axios.post('http://localhost:5000/company/auth/register', {
-        name: company,
-        email,
-        website,
-        HRName: hrname,
-        phoneNumber: phone,
-        location,
-        description,
-        password,
-        confirmPassword,
+      const data = new FormData()
+      data.append("name", company)
+      data.append("email", email)
+      data.append("website", website)
+      data.append("HRName", hrname)
+      data.append("phoneNumber", phone)
+      data.append("location", location)
+      data.append("description", description)
+      data.append("password", password)
+      data.append("confirmPassword", confirmPassword)
+      
+      if (profilePhoto) {
+        data.append("profilePhoto", profilePhoto)
+      }
+
+      await axios.post('http://localhost:5000/company/auth/register', data, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
       })
-      navigate('/companylogin')
+      
+      setStatusMessage('Registration successful! Redirecting to login...')
+      
+      setTimeout(() => {
+        navigate('/companylogin')
+      }, 2000)
     } catch (error) {
       const message = error.response?.data?.error || 'Unable to register company.'
       setStatusMessage(message)
@@ -134,6 +166,30 @@ function Companyreg() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+
+          <div className='form-field' style={{ marginBottom: "15px" }}>
+            <label>Profile Photo (Accepts JPG, PNG, WEBP)</label>
+            <input
+              type='file'
+              accept='image/*'
+              onChange={handlePhotoChange}
+              style={{ display: "none" }}
+              id="profilePhotoUpload"
+            />
+            <div style={{ display: "flex", alignItems: "center", gap: "15px", marginTop: "8px" }}>
+              <label htmlFor="profilePhotoUpload" className="btn" style={{ margin: 0, padding: "8px 16px", cursor: "pointer", width: "auto", display: "inline-block", background: "#3b82f6" }}>
+                Choose Profile Photo
+              </label>
+              {photoPreview && (
+                <img
+                  src={photoPreview}
+                  alt="Preview"
+                  style={{ width: "50px", height: "50px", borderRadius: "50%", objectFit: "cover", border: "2px solid #3b82f6" }}
+                />
+              )}
+              {profilePhoto && <span style={{ color: "#cbd5e1", fontSize: "14px" }}>{profilePhoto.name}</span>}
+            </div>
           </div>
 
           <div className='form-row'>

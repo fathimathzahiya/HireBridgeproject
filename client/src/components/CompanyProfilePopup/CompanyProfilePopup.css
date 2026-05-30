@@ -1,0 +1,294 @@
+/* Company Profile Popup Styles */
+.company-profile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out;
+  backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.company-profile-popup {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fb 100%);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 520px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  animation: slideUp 0.3s ease-in-out;
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(240, 240, 240, 0.8);
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 20px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.close-btn:hover {
+  background: #e74c3c;
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Profile Header */
+.company-profile-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #ecf0f1;
+  padding-bottom: 20px;
+}
+
+.company-profile-image {
+  width: 110px;
+  height: 110px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 4px solid #3498db;
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.company-profile-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+}
+
+.company-profile-name h2 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.company-profile-name .industry {
+  margin: 5px 0 0 0;
+  color: #7f8c8d;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Profile Details */
+.company-profile-details {
+  margin: 20px 0;
+}
+
+.detail-section {
+  margin-bottom: 28px;
+}
+
+.detail-section h3 {
+  color: #1d4ed8;
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 12px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.detail-item:hover {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.detail-item .label {
+  color: #64748b;
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  min-width: auto;
+}
+
+.detail-item .value {
+  color: #0f172a;
+  text-align: left;
+  flex: none;
+  width: 100%;
+  word-break: break-word;
+  font-weight: 500;
+}
+
+.detail-item a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  padding: 2px 0;
+  display: inline-block;
+}
+
+.detail-item a:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.description {
+  color: #555;
+  line-height: 1.6;
+  font-size: 14px;
+  margin: 0;
+  padding: 12px;
+  background: rgba(52, 152, 219, 0.05);
+  border-radius: 8px;
+}
+
+/* Action Buttons */
+.company-profile-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 2px solid #ecf0f1;
+}
+
+.btn-edit,
+.btn-close {
+  flex: 1;
+  padding: 14px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-edit {
+  background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+  color: white;
+}
+
+.btn-edit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+.btn-close {
+  background: #ecf0f1;
+  color: #555;
+}
+
+.btn-close:hover {
+  background: #bdc3c7;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Scrollbar Styling */
+.company-profile-popup::-webkit-scrollbar {
+  width: 6px;
+}
+
+.company-profile-popup::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.company-profile-popup::-webkit-scrollbar-thumb {
+  background: #3498db;
+  border-radius: 10px;
+}
+
+.company-profile-popup::-webkit-scrollbar-thumb:hover {
+  background: #2980b9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .company-profile-popup {
+    width: 95%;
+    padding: 20px;
+  }
+
+
+
+  .company-profile-name h2 {
+    font-size: 22px;
+  }
+
+  .detail-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .detail-item .label {
+    min-width: auto;
+  }
+
+  .detail-item .value {
+    text-align: left;
+  }
+
+  .company-profile-actions {
+    flex-direction: column;
+  }
+
+  .btn-edit,
+  .btn-close {
+    width: 100%;
+  }
+}

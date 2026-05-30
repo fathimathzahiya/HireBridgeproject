@@ -26,11 +26,20 @@ function Login({ defaultRole = 'student' }) {
       const response = await axios.post(endpoint, { email, password })
       const userData = { ...response.data, role }
       localStorage.setItem('hirebridge_user', JSON.stringify(userData))
-
+      if (response.data.token) {
+        localStorage.setItem('hirebridge_token', response.data.token)
+      }
+      
+      // Store student ID for profile fetching
       if (role === 'student') {
-        navigate('/student/dashboard')
+        localStorage.setItem('studentId', response.data.id)
+        localStorage.setItem('studentName', response.data.username)
+        navigate('/student-dashboard')
       } else {
-        navigate('/company/dashboard')
+        localStorage.setItem('companyId', response.data.id)
+        localStorage.setItem('companyName', response.data.name)
+        localStorage.setItem('companyEmail', response.data.email)
+        navigate(`/company/${response.data.id}/overview`)
       }
     } catch (error) {
       const message = error.response?.data?.error || 'Unable to login. Please try again.'

@@ -1,0 +1,374 @@
+import React, { useState } from "react";
+import "./EditProfile.css";
+
+function EditProfile({ studentData, onClose, onSave }) {
+  const [formData, setFormData] = useState({
+    username: studentData?.username || "",
+    phoneNumber: studentData?.phoneNumber || "",
+    department: studentData?.department || "",
+    cgpa: studentData?.cgpa || "",
+    project: studentData?.project || "",
+    skills: studentData?.skills || "",
+    certification: studentData?.certification || "",
+    address: studentData?.address || "",
+    github: studentData?.github || "",
+    linkedin: studentData?.linkedin || "",
+    profileImage: studentData?.profileImage || "",
+  });
+
+  const [resumeFile, setResumeFile] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(
+    studentData?.profileImage
+      ? studentData.profileImage.startsWith("http")
+        ? studentData.profileImage
+        : `http://localhost:5000${studentData.profileImage}`
+      : ""
+  );
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setError("Please upload an image file");
+        setImageFile(null);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        setImageFile(null);
+        return;
+      }
+      setImageFile(file);
+      setError("");
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleResumeChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Please upload a PDF file");
+        setResumeFile(null);
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("File size must be less than 5MB");
+        setResumeFile(null);
+        return;
+      }
+      setResumeFile(file);
+      setError("");
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      const studentId = localStorage.getItem("studentId");
+      if (!studentId) {
+        setError("Student ID not found. Please login again.");
+        setLoading(false);
+        return;
+      }
+
+      // Create FormData for multipart request
+      const data = new FormData();
+      
+      // Add text fields
+      Object.keys(formData).forEach(key => {
+        if (key !== "profileImage") {
+          if (formData[key]) {
+            data.append(key, formData[key]);
+          }
+        } else if (!imageFile && formData[key]) {
+          data.append(key, formData[key]);
+        }
+      });
+
+      // Add resume file if selected
+      if (resumeFile) {
+        data.append("resume", resumeFile);
+      }
+
+      // Add profile image file if selected
+      if (imageFile) {
+        data.append("profileImage", imageFile);
+      }
+
+      const token = localStorage.getItem("hirebridge_token");
+      const headers = {};
+      if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(
+        `http://localhost:5000/api/student/updatestudent/${studentId}`,
+        {
+          method: "PUT",
+          headers,
+          body: data,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update profile");
+      }
+
+      const updatedData = await response.json();
+      setSuccess("Profile updated successfully!");
+      
+      // Call parent callback to update student data
+      if (onSave) {
+        onSave(updatedData);
+      }
+
+      // Close modal after 2 seconds
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } catch (err) {
+      console.error("Error updating profile:", err);
+      setError(err.message || "Failed to update profile. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="edit-profile-overlay" onClick={onClose}>
+      <div className="edit-profile" onClick={(e) => e.stopPropagation()}>
+        {/* Close Button */}
+        <button className="close-btn" onClick={onClose}>✕</button>
+
+        <h2>Edit Profile</h2>
+
+        {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">{success}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-row">
+            <div className="form-group">
+              <label>Name</label>
+              <input
+                type="text"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label>Phone</label>
+              <input
+                type="tel"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Department</label>
+              <input
+                type="text"
+                name="department"
+                value={formData.department}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="form-group">
+              <label>CGPA</label>
+              <input
+                type="number"
+                name="cgpa"
+                value={formData.cgpa}
+                onChange={handleChange}
+                step="0.01"
+                min="0"
+                max="10"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Address</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Skills</label>
+              <textarea
+                name="skills"
+                value={formData.skills}
+                onChange={handleChange}
+                placeholder="e.g., React, Node.js, MongoDB"
+                rows="3"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Projects</label>
+              <textarea
+                name="project"
+                value={formData.project}
+                onChange={handleChange}
+                placeholder="Describe your projects"
+                rows="3"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Certifications</label>
+              <textarea
+                name="certification"
+                value={formData.certification}
+                onChange={handleChange}
+                placeholder="List your certifications"
+                rows="3"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Resume (PDF File)</label>
+              <input
+                type="file"
+                name="resume"
+                accept="application/pdf"
+                onChange={handleResumeChange}
+              />
+              <p className="file-hint">PDF only, max 5MB. Leave blank to keep existing resume.</p>
+              {resumeFile && (
+                <p className="file-selected">✓ {resumeFile.name}</p>
+              )}
+              {studentData?.resume && !resumeFile && (
+                <p className="existing-file">
+                  Current resume:{" "}
+                  <a
+                    href={
+                      studentData.resume.startsWith("http")
+                        ? studentData.resume
+                        : `http://localhost:5000${studentData.resume}`
+                    }
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Download
+                  </a>
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>GitHub Profile</label>
+              <input
+                type="url"
+                name="github"
+                value={formData.github}
+                onChange={handleChange}
+                placeholder="https://github.com/username"
+              />
+            </div>
+            <div className="form-group">
+              <label>LinkedIn Profile</label>
+              <input
+                type="url"
+                name="linkedin"
+                value={formData.linkedin}
+                onChange={handleChange}
+                placeholder="https://linkedin.com/in/username"
+              />
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label>Profile Image</label>
+              <input
+                type="file"
+                name="profileImageFile"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+              <p className="file-hint">Upload JPG, PNG or GIF. Max 5MB.</p>
+              {imagePreview && (
+                <div className="image-preview-container" style={{ marginTop: "10px" }}>
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    style={{
+                      width: "80px",
+                      height: "80px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                      border: "2px solid #3b82f6",
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="submit"
+              className="btn-save"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </button>
+            <button
+              type="button"
+              className="btn-cancel"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+export default EditProfile;

@@ -4,41 +4,169 @@ import './Studentreg.css'
 import { Link, useNavigate } from 'react-router-dom'
 
 function Studentreg() {
-  const [fullname, setFullname] = useState('')
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
-  const [college, setCollege] = useState('')
-  const [branch, setBranch] = useState('')
-  const [year, setYear] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const [formData, setFormData] = useState({
+    fullname: '',
+    email: '',
+    phone: '',
+    department: '',
+    cgpa: '',
+    project: '',
+    skills: '',
+    certification: '',
+    resume: '',
+    profileImage: '',
+    github: '',
+    linkedin: '',
+    address: '',
+    password: '',
+    confirmPassword: '',
+  })
+
+  const [filePreview, setFilePreview] = useState({
+    profileImage: null,
+    resume: null,
+    certification: null,
+  })
+
+  const [files, setFiles] = useState({
+    profileImage: null,
+    resume: null,
+    certification: null,
+  })
+
   const [statusMessage, setStatusMessage] = useState('')
+  const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
+
+  const handleChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }))
+  }
+
+  const handleFileChange = (e) => {
+    const { name, files: fileList } = e.target
+    if (fileList && fileList[0]) {
+      const file = fileList[0]
+      
+      // Store the actual file object
+      setFiles(prev => ({
+        ...prev,
+        [name]: file,
+      }))
+      
+      // Show preview for images only
+      if (name === 'profileImage') {
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          setFilePreview(prev => ({
+            ...prev,
+            profileImage: event.target.result,
+          }))
+        }
+        reader.readAsDataURL(file)
+      } else if (name === 'resume') {
+        setFilePreview(prev => ({
+          ...prev,
+          resume: file.name,
+        }))
+      } else if (name === 'certification') {
+        setFilePreview(prev => ({
+          ...prev,
+          certification: file.name,
+        }))
+      }
+    }
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setStatusMessage('')
+    setLoading(true)
 
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       setStatusMessage('Passwords must match.')
+      setLoading(false)
+      return
+    }
+
+    if (!formData.fullname || !formData.email || !formData.phone || !formData.password) {
+      setStatusMessage('Please fill all required fields (marked with *).')
+      setLoading(false)
       return
     }
 
     try {
-      await axios.post('http://localhost:5000/student/auth/register', {
-        username: fullname,
-        email,
-        phoneNumber: phone,
-        college,
-        branch,
-        year,
-        password,
-        confirmPassword,
+      const response = await axios.post('http://localhost:5000/student/auth/register', {
+        username: formData.fullname,
+        email: formData.email,
+        phoneNumber: formData.phone,
+        college: formData.department || 'Not specified',
+        branch: 'Not specified',
+        year: 'Not specified',
+        password: formData.password,
+        confirmPassword: formData.confirmPassword,
       })
-      navigate('/studentlogin')
+
+      console.log('Auth registration successful:', response.data);
+
+      // Create FormData for file upload
+      const profileFormData = new FormData()
+      
+      // Only append non-empty fields
+      if (formData.fullname) profileFormData.append('username', formData.fullname)
+      if (formData.email) profileFormData.append('email', formData.email)
+      if (formData.phone) profileFormData.append('phoneNumber', formData.phone)
+      if (formData.department) profileFormData.append('department', formData.department)
+      if (formData.cgpa) profileFormData.append('cgpa', parseFloat(formData.cgpa))
+      if (formData.project) profileFormData.append('project', formData.project)
+      if (formData.skills) profileFormData.append('skills', formData.skills)
+      if (formData.github) profileFormData.append('github', formData.github)
+      if (formData.linkedin) profileFormData.append('linkedin', formData.linkedin)
+      if (formData.address) profileFormData.append('address', formData.address)
+      if (formData.password) profileFormData.append('password', formData.password)
+      if (formData.confirmPassword) profileFormData.append('confirmPassword', formData.confirmPassword)
+
+      // Append files if they exist
+      if (files.resume) {
+        profileFormData.append('resume', files.resume)
+      }
+      if (files.profileImage) {
+        profileFormData.append('profileImage', files.profileImage)
+      }
+      if (files.certification) {
+        profileFormData.append('certification', files.certification)
+      }
+
+      console.log('Updating student profile with ID:', response.data.id);
+
+      // Send with FormData
+      const updateResponse = await axios.put(
+        `http://localhost:5000/api/student/updatestudent/${response.data.id}`,
+        profileFormData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      )
+
+      console.log('Profile update successful:', updateResponse.data);
+
+      setStatusMessage('Registration successful! Redirecting to login...')
+      
+      setTimeout(() => {
+        navigate('/studentlogin')
+      }, 2000)
     } catch (error) {
-      const message = error.response?.data?.error || 'Unable to register student.'
+      console.error('Registration error:', error);
+      console.error('Error response:', error.response);
+      const message = error.response?.data?.error || error.message || 'Unable to register student.'
       setStatusMessage(message)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -49,120 +177,258 @@ function Studentreg() {
       </div>
 
       <div className='register-box'>
-        <h1 className='title'>Register Student</h1>
-        <p className='subtitle'>Enter your academic details to get started.</p>
+        <h1 className='title'>Register as Student</h1>
+        <p className='subtitle'>Complete your profile to get started with HireBridge.</p>
 
         <form onSubmit={handleSubmit}>
+          {/* Required Fields */}
+          <div className='section-title'>Basic Information *</div>
+          
           <div className='form-row'>
             <div className='form-field'>
-              <label>Full Name</label>
+              <label>Full Name *</label>
               <input
                 type='text'
+                name='fullname'
                 placeholder='Enter your full name'
                 className='textbox'
-                value={fullname}
-                onChange={(e) => setFullname(e.target.value)}
+                value={formData.fullname}
+                onChange={handleChange}
+                required
               />
             </div>
             <div className='form-field'>
-              <label>Email</label>
+              <label>Email Address *</label>
               <input
                 type='email'
+                name='email'
                 placeholder='Enter your email'
                 className='textbox'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={formData.email}
+                onChange={handleChange}
+                required
               />
             </div>
           </div>
 
           <div className='form-row'>
             <div className='form-field'>
-              <label>Phone Number</label>
+              <label>Phone Number *</label>
               <input
-                type='text'
+                type='tel'
+                name='phone'
                 placeholder='Enter phone number'
                 className='textbox'
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={formData.phone}
+                onChange={handleChange}
+                required
               />
             </div>
             <div className='form-field'>
-              <label>College / University</label>
+              <label>Address</label>
               <input
                 type='text'
-                placeholder='Enter college or university'
+                name='address'
+                placeholder='Enter your address'
                 className='textbox'
-                value={college}
-                onChange={(e) => setCollege(e.target.value)}
+                value={formData.address}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          {/* Academic Information */}
+          <div className='section-title'>Academic Information</div>
+          
+          <div className='form-row'>
+            <div className='form-field'>
+              <label>Department</label>
+              <input
+                type='text'
+                name='department'
+                placeholder='e.g., Computer Science, Mechanical Engineering'
+                className='textbox'
+                value={formData.department}
+                onChange={handleChange}
+              />
+            </div>
+            <div className='form-field'>
+              <label>CGPA</label>
+              <input
+                type='number'
+                name='cgpa'
+                placeholder='e.g., 8.5'
+                className='textbox'
+                step='0.01'
+                min='0'
+                max='10'
+                value={formData.cgpa}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          {/* Professional Information */}
+          <div className='section-title'>Professional Information</div>
+          
+          <div className='form-row'>
+            <div className='form-field full-width'>
+              <label>Skills</label>
+              <textarea
+                name='skills'
+                placeholder='e.g., JavaScript, React, Node.js, MongoDB, Python'
+                className='textbox'
+                rows='3'
+                value={formData.skills}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className='form-row'>
+            <div className='form-field full-width'>
+              <label>Projects</label>
+              <textarea
+                name='project'
+                placeholder='Describe your projects and achievements'
+                className='textbox'
+                rows='3'
+                value={formData.project}
+                onChange={handleChange}
+              />
+            </div>
+          </div>
+
+          <div className='form-row'>
+            <div className='form-field full-width'>
+              <label htmlFor='certificationUpload'>Certifications (Upload PDF/Image)</label>
+              <div className='file-input-wrapper'>
+                <input
+                  id='certificationUpload'
+                  type='file'
+                  name='certification'
+                  accept='.pdf,.jpg,.jpeg,.png,.doc,.docx'
+                  className='file-input'
+                  onChange={handleFileChange}
+                />
+                <label htmlFor='certificationUpload' className='file-input-label'>Choose File</label>
+              </div>
+              <p className='file-info'>Supported: PDF, Images (JPG, PNG), Documents (DOC, DOCX)</p>
+              {filePreview.certification && <p className='file-selected'>✓ {filePreview.certification}</p>}
+            </div>
+          </div>
+
+          {/* Links & Documents */}
+          <div className='section-title'>Links & Documents</div>
+          
+          <div className='form-row'>
+            <div className='form-field'>
+              <label>GitHub Profile</label>
+              <input
+                type='url'
+                name='github'
+                placeholder='https://github.com/username'
+                className='textbox'
+                value={formData.github}
+                onChange={handleChange}
+              />
+            </div>
+            <div className='form-field'>
+              <label>LinkedIn Profile</label>
+              <input
+                type='url'
+                name='linkedin'
+                placeholder='https://linkedin.com/in/username'
+                className='textbox'
+                value={formData.linkedin}
+                onChange={handleChange}
               />
             </div>
           </div>
 
           <div className='form-row'>
             <div className='form-field'>
-              <label>Branch</label>
-              <input
-                type='text'
-                placeholder='Enter your branch'
-                className='textbox'
-                value={branch}
-                onChange={(e) => setBranch(e.target.value)}
-              />
+              <label htmlFor='resumeUpload'>Resume (Upload PDF)</label>
+              <div className='file-input-wrapper'>
+                <input
+                  id='resumeUpload'
+                  type='file'
+                  name='resume'
+                  accept='.pdf'
+                  className='file-input'
+                  onChange={handleFileChange}
+                />
+                <label htmlFor='resumeUpload' className='file-input-label'>Choose File</label>
+              </div>
+              <p className='file-info'>PDF only (Max 5MB)</p>
+              {filePreview.resume && <p className='file-selected'>✓ {filePreview.resume}</p>}
             </div>
             <div className='form-field'>
-              <label>Year</label>
-              <input
-                type='text'
-                placeholder='Enter your year of study'
-                className='textbox'
-                value={year}
-                onChange={(e) => setYear(e.target.value)}
-              />
+              <label htmlFor='profileImageUpload'>Profile Image (Upload JPG/PNG)</label>
+              <div className='file-input-wrapper'>
+                <input
+                  id='profileImageUpload'
+                  type='file'
+                  name='profileImage'
+                  accept='.jpg,.jpeg,.png'
+                  className='file-input'
+                  onChange={handleFileChange}
+                />
+                <label htmlFor='profileImageUpload' className='file-input-label'>Choose File</label>
+              </div>
+              <p className='file-info'>JPG or PNG (Max 2MB)</p>
+              {filePreview.profileImage && (
+                <div className='image-preview'>
+                  <img src={filePreview.profileImage} alt='Profile Preview' />
+                </div>
+              )}
             </div>
           </div>
 
+          {/* Password */}
+          <div className='section-title'>Security Information *</div>
+          
           <div className='form-row'>
             <div className='form-field'>
-              <label>Password</label>
+              <label>Password *</label>
               <input
                 type='password'
-                placeholder='Password'
+                name='password'
+                placeholder='Create a strong password'
                 className='textbox'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleChange}
+                required
               />
             </div>
             <div className='form-field'>
-              <label>Confirm Password</label>
+              <label>Confirm Password *</label>
               <input
                 type='password'
-                placeholder='Confirm password'
+                name='confirmPassword'
+                placeholder='Confirm your password'
                 className='textbox'
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                required
               />
             </div>
           </div>
 
-          {statusMessage && <div className='error-message'>{statusMessage}</div>}
+          {statusMessage && (
+            <div className={statusMessage.includes('successful') ? 'success-message' : 'error-message'}>
+              {statusMessage}
+            </div>
+          )}
 
-          <button type='submit' className='btn'>
-            Create Student Account →
+          <button type='submit' className='btn' disabled={loading}>
+            {loading ? 'Registering...' : 'Register Now'}
           </button>
         </form>
 
-        <p className='login-text'>
-          Already have a student account?
-          <Link to={'/studentlogin'} className='login'> Login</Link>
-        </p>
-      </div>
-
-      <div className='footer'>
-        <h2>HireBridge</h2>
-        <p>
-          © 2024 HireBridge Placement Solutions.
-          All rights reserved.
+        <p className='login-link'>
+          Already have an account?
+          <Link to='/studentlogin'> Sign In</Link>
         </p>
       </div>
     </div>

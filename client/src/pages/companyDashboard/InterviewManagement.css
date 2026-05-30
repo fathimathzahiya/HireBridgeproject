@@ -1,0 +1,317 @@
+/* Interview Management Styles */
+
+.interview-management-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.interview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.interview-header h2 {
+  margin: 0;
+  font-size: 24px;
+  color: #2d3748;
+}
+
+/* Schedule Form */
+.schedule-form-container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.interview-form h3 {
+  margin: 0 0 20px 0;
+  font-size: 20px;
+  color: #2d3748;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.btn-submit {
+  padding: 12px 24px;
+  background: #2ecc71;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s ease;
+}
+
+.btn-submit:hover {
+  background: #27ae60;
+}
+
+.btn-primary {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary.btn-schedule-toggle {
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  width: auto;
+  max-width: 180px;
+}
+
+/* Interviews Grid */
+.interviews-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.interview-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.interview-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.interview-header-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.interview-header-card h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #2d3748;
+}
+
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.warning {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.interview-details {
+  flex: 1;
+  margin-bottom: 15px;
+  font-size: 13px;
+}
+
+.interview-details p {
+  margin: 8px 0;
+  color: #555;
+}
+
+.interview-details strong {
+  color: #2d3748;
+}
+
+.interview-details a {
+  color: #667eea;
+  text-decoration: none;
+}
+
+.interview-details a:hover {
+  text-decoration: underline;
+}
+
+.result-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.result-badge.success {
+  background: #d4edda;
+  color: #155724;
+}
+
+.result-badge.danger {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.result-badge.secondary {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.result-badge.info {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+/* Interview Actions */
+.interview-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-select,
+.btn-reject,
+.btn-cancel {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-select {
+  background: #2ecc71;
+  color: white;
+}
+
+.btn-select:hover {
+  background: #27ae60;
+}
+
+.btn-reject {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-reject:hover {
+  background: #c0392b;
+}
+
+.btn-cancel {
+  background: #f39c12;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background: #e67e22;
+}
+
+.no-interviews {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  color: #666;
+}
+
+.error-message {
+  background: #fadbd8;
+  color: #c0392b;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .interview-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .interviews-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .interview-actions {
+    flex-direction: column;
+  }
+
+  .btn-select,
+  .btn-reject,
+  .btn-cancel {
+    width: 100%;
+  }
+}

@@ -2,67 +2,99 @@ const { Schema, model } = require("mongoose");
 
 const studentSchema = new Schema(
   {
+    // ========== SECURITY INFORMATION ==========
+    password: {
+      type: String,
+      required: true,
+    },
+
+    confirmPassword: {
+      type: String,
+      required: false,
+    },
+
+    // ========== BASIC INFORMATION ==========
     username: {
       type: String,
       required: true,
     },
 
-    phoneNumber: {
-      type: Number,
-      required: true,
-    },
-
-    department: {
+    email: {
       type: String,
       required: true,
+      unique: true,
     },
 
-    cgpa: {
-      type: Number,
-      required: true,
-    },
-
-    project: {
-       type: String,
-       required: true,
-    },
-
-    skills: {
-       type:String,
-       required: true,
-    },
-
-    certification: {
-       type:String,
-       required: true,
-
-    },
-
-    resume: {
-      type:String,
-      required: true,
-    },
-
-    profileImage: {
-      type:String,
-      required: true,
-    },
-
-    github: {
-      type:String,
-      required: true,
-    },
-
-    linkedin: {
-     type:String,
-     required: true,
+    phoneNumber: {
+      type: String,
+      required: false,
     },
 
     address: {
       type: String,
-      required: true,
+      required: false,
     },
-  },
+
+    // ========== ACADEMIC INFORMATION ==========
+    department: {
+      type: String,
+      required: false,
+    },
+
+    cgpa: {
+      type: Number,
+      required: false,
+    },
+
+    // ========== PROFESSIONAL INFORMATION ==========
+    skills: {
+      type: String,
+      required: false,
+    },
+
+    project: {
+      type: String,
+      required: false,
+    },
+
+    // ========== LINKS & DOCUMENTS ==========
+    github: {
+      type: String,
+      required: false,
+    },
+
+    linkedin: {
+      type: String,
+      required: false,
+    },
+
+    resume: {
+      type: String,
+      required: false,
+    },
+
+    certification: {
+      type: String,
+      required: false,
+    },
+
+    profileImage: {
+      type: String,
+      default: "https://i.pravatar.cc/150",
+    },
+
+    // ========== ACCOUNT CONTROL ==========
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+
+    // ========== METADATA ==========
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
+  }
 );
 
 const studentCollection = model("student", studentSchema);
