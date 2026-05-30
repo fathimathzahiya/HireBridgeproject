@@ -141,14 +141,19 @@ function Studentreg() {
       }
 
       console.log('Updating student profile with ID:', response.data.id);
+      const token = response.data.token;
 
-      // Send with FormData
+      if (token) {
+        localStorage.setItem('hirebridge_token', token)
+      }
+
+      // Send with FormData and JWT auth header
       const updateResponse = await axios.put(
         `http://localhost:5000/api/student/updatestudent/${response.data.id}`,
         profileFormData,
         {
           headers: {
-            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${token}`,
           },
         }
       )
