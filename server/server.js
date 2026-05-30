@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -53,8 +54,9 @@ const seedAdmin = async () => {
   }
 };
 
-app.listen(5000, () => {
-  console.log("server running");
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`server running on port ${PORT}`);
   console.log("mongoDB connected");
   seedAdmin();
 });
